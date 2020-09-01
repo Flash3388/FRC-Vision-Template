@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id 'org.hidetake.ssh' version '2.10.1'
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -10,6 +11,17 @@ repositories {
 
     maven {
         url('https://frcmaven.wpi.edu/artifactory/release')
+    }
+}
+
+remotes {
+    target {
+        host = "$DEPLOY_HOST"
+        user = "$DEPLOY_USER"
+
+        if (project.hasProperty('targetPassword')) {
+            password = project.property('targetPassword')
+        }
     }
 }
 
@@ -37,4 +49,34 @@ application {
 
 run {
     args project.file('frc.json').absolutePath
+}
+
+task deploy {
+    dependsOn tasks.build
+    doLast {
+        ssh.run {
+            session(remotes.target) {
+                def distributionName = "${application.applicationName}.zip"
+
+                // delete old version
+                execute "rm -rf ${DEPLOY_PATH}/${application.applicationName}"
+
+                // upload new code
+                put from: "${project.buildDir}/distributions/${distributionName}", into: "$DEPLOY_PATH"
+                execute "unzip ${DEPLOY_PATH}/${distributionName}"
+            }
+        }
+    }
+}
+
+task runRemote {
+    dependsOn tasks.deploy
+    doLast {
+        ssh.run {
+            session(remotes.target) {
+                execute "cd ${DEPLOY_PATH}/${application.applicationName}"
+                execute "./bin/${application.applicationName}"
+            }
+        }
+    }
 }

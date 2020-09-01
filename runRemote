@@ -1,3 +1,0 @@
-#!/bin/sh
-
-ssh flash@flash-jetson.local sh /home/flash/runCamera
