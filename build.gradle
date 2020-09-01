@@ -18,6 +18,9 @@ dependencies {
 
     implementation "com.google.code.gson:gson:2.8.5"
 
+    implementation group: "edu.wpi.first.thirdparty.frc${YEAR}.opencv", name: 'opencv-java', version: "$OPENCV_VERSION"
+    implementation group: "edu.wpi.first.thirdparty.frc${YEAR}.opencv", name: 'opencv-jni', version: "$OPENCV_VERSION", classifier: "$REMOTE_ARCH"
+
     implementation "edu.wpi.first.wpilibj:wpilibj-java:$WPILIB_VERSION"
     implementation "edu.wpi.first.wpiutil:wpiutil-java:$WPILIB_VERSION"
     implementation "edu.wpi.first.cscore:cscore-java:$WPILIB_VERSION"
