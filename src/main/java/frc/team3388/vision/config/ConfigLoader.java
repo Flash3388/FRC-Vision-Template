@@ -1,10 +1,9 @@
-package edu.wpi.first;
+package frc.team3388.vision.config;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.flash3388.vision.template.TemplateMatchingMethod;
 import org.opencv.core.Range;
 
 import java.io.BufferedReader;
@@ -46,12 +45,10 @@ public class ConfigLoader {
         int teamNumber = parseTeamNumber(rootObject);
         NtMode ntMode = parseNtMode(rootObject);
         List<CameraConfig> cameraConfigs = parseCameraConfigs(rootObject);
-        TemplateMatchingMethod templateMatchingMethod = parseTemplateMatchingMethod(rootObject);
-        File visionTemplate = parseVisionTemplate(rootObject);
-        double templateMatchingScaleFactor = parseTemplateMatchingScaleFactor(rootObject);
         VisionConfig visionConfig = parseVisionConfig(rootObject);
+        TargetConfig targetConfig = parseTargetConfig(rootObject);
 
-        return new Config(teamNumber, ntMode, cameraConfigs, templateMatchingMethod, visionTemplate, templateMatchingScaleFactor, visionConfig);
+        return new Config(teamNumber, ntMode, cameraConfigs, visionConfig, targetConfig);
     }
 
     private int parseTeamNumber(JsonObject rootObject) throws ConfigLoadException {
@@ -130,45 +127,7 @@ public class ConfigLoader {
 
             return new CameraConfig(name, path, cameraRoot, fov);
         } catch (ClassCastException | IllegalStateException e) {
-            throw new ConfigLoadException("camera config element is not of wanted type", e);
-        }
-    }
-
-    private TemplateMatchingMethod parseTemplateMatchingMethod(JsonObject rootObject) throws ConfigLoadException {
-        try {
-            if (!rootObject.has("templateMatchingMethod")) {
-                throw new ConfigLoadException("missing `templateMatchingMethod`");
-            }
-
-            String strVal = rootObject.get("templateMatchingMethod").getAsString();
-            return TemplateMatchingMethod.valueOf(strVal);
-        } catch (ClassCastException e) {
-            throw new ConfigLoadException("`templateMatchingMethod` element is not a string");
-        }
-    }
-
-    private File parseVisionTemplate(JsonObject rootObject) throws ConfigLoadException {
-        try {
-            if (!rootObject.has("visionTemplatePath")) {
-                throw new ConfigLoadException("missing `visionTemplatePath`");
-            }
-
-            String strVal = rootObject.get("visionTemplatePath").getAsString();
-            return new File(strVal);
-        } catch (ClassCastException e) {
-            throw new ConfigLoadException("`visionTemplatePath` element is not a string");
-        }
-    }
-
-    private double parseTemplateMatchingScaleFactor(JsonObject rootObject) throws ConfigLoadException {
-        try {
-            if (!rootObject.has("templateMatchingScaleFactor")) {
-                throw new ConfigLoadException("missing `templateMatchingScaleFactor`");
-            }
-
-            return rootObject.get("templateMatchingScaleFactor").getAsDouble();
-        } catch (ClassCastException e) {
-            throw new ConfigLoadException("`templateMatchingScaleFactor` element is not a double");
+            throw new ConfigLoadException("camera frc.team3388.vision.config element is not of wanted type", e);
         }
     }
 
@@ -193,7 +152,7 @@ public class ConfigLoader {
 
             JsonObject range = rootObject.getAsJsonObject(memberName);
             if (!range.has("min") || !range.has("max")) {
-                throw new ConfigLoadException("Range missing min/max: "+ memberName);
+                throw new ConfigLoadException("Range missing min/max: " + memberName);
             }
 
             return new Range(
@@ -201,7 +160,15 @@ public class ConfigLoader {
                     range.get("max").getAsInt()
             );
         } catch (ClassCastException e) {
-            throw new ConfigLoadException("Range type error, should be object with min/max integers: "+memberName);
+            throw new ConfigLoadException("Range type error, should be object with min/max integers: " + memberName);
         }
+    }
+
+    private TargetConfig parseTargetConfig(JsonObject rootObject) throws ConfigLoadException {
+        if (!rootObject.has("target")) {
+            throw new ConfigLoadException("missing 'target'");
+        }
+
+        return new TargetConfig(rootObject.getAsJsonObject("target"));
     }
 }

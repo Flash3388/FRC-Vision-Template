@@ -1,4 +1,4 @@
-package edu.wpi.first;
+package frc.team3388.vision.config;
 
 import com.google.gson.JsonObject;
 
@@ -26,6 +26,14 @@ public class CameraConfig {
 
     public JsonObject getJsonData() {
         return mJsonData;
+    }
+
+    public int getHeight() {
+        return mJsonData.get("height").getAsInt();
+    }
+
+    public int getWidth() {
+        return mJsonData.get("width").getAsInt();
     }
 
     public double getCameraFieldOfViewRadians() {

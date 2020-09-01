@@ -1,4 +1,4 @@
-package main;
+package frc.team3388.vision;
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -6,8 +6,9 @@ package main;
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-import edu.wpi.first.Config;
-import edu.wpi.first.ConfigLoader;
+import com.castle.util.throwables.ThrowableHandler;
+import frc.team3388.vision.config.Config;
+import frc.team3388.vision.config.ConfigLoader;
 
 import java.io.File;
 /*
@@ -47,12 +48,13 @@ public final class Main {
             configFilePath = args[0];
         }
 
+        ThrowableHandler throwableHandler = (t)-> {};
         try {
             Config config = new ConfigLoader(new File(configFilePath)).load();
             CameraControl cameraControl = new CameraControl(config);
             NtControl ntControl = new NtControl(config);
 
-            FrcVision frcVision = new FrcVision(config, cameraControl, ntControl);
+            FrcVision frcVision = new FrcVision(config, cameraControl, ntControl, throwableHandler);
             frcVision.startVision();
         } catch (Throwable e) {
             e.printStackTrace();

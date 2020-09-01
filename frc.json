@@ -11,5 +11,9 @@
         }
     ],
     "ntmode": "client",
-    "team": 3388
+    "team": 3388,
+    "target": {
+        "realWidth": 92,
+        "dimensionsRatio": 0.456521739
+    }
 }

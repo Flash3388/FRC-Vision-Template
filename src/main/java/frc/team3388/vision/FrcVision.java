@@ -1,26 +1,27 @@
-package main;
+package frc.team3388.vision;
 
-import com.flash3388.vision.ColorSettings;
-import com.flash3388.vision.ImageAnalyser;
-import com.flash3388.vision.cv.CvProcessing;
+import com.castle.util.throwables.ThrowableHandler;
+import com.flash3388.flashlib.vision.cv.CvProcessing;
+import com.flash3388.flashlib.vision.processing.color.HsvColorSettings;
 import edu.wpi.cscore.CvSource;
-import edu.wpi.cscore.MjpegServer;
-import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.Config;
 import edu.wpi.first.cameraserver.CameraServer;
+import frc.team3388.vision.config.Config;
 
 import java.util.List;
 
 public class FrcVision {
+
     private final Config mConfig;
     private final CameraControl mCameraControl;
     private final NtControl mNtControl;
+    private final ThrowableHandler mThrowableHandler;
 
-    public FrcVision(Config config, CameraControl cameraControl, NtControl ntControl) {
+    public FrcVision(Config config, CameraControl cameraControl, NtControl ntControl, ThrowableHandler throwableHandler) {
         mConfig = config;
         mCameraControl = cameraControl;
         mNtControl = ntControl;
+        mThrowableHandler = throwableHandler;
     }
 
     public void startVision() {
@@ -43,16 +44,16 @@ public class FrcVision {
         CvSource cvSource = CameraServer.getInstance()
                 .putVideo("processed", 480, 320);
 
-        ColorSettings colorSettings = mNtControl.colorSettings();
+        HsvColorSettings colorSettings = mNtControl.colorSettings();
 
         new VisionControl(
-                new CvProcessing(), new ImageAnalyser(),
-                cvSource, colorSettings)
+                new CvProcessing(),
+                cvSource, colorSettings, mNtControl, config.getTargetConfig(), mThrowableHandler)
                 .startForCamera(camera, config.getCameraConfigs().get(0));
     }
 
     private static void waitForever() {
-        for (;;) {
+        for (; ; ) {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException ex) {

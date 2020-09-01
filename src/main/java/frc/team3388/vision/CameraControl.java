@@ -1,17 +1,17 @@
-package main;
+package frc.team3388.vision;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.CameraConfig;
-import edu.wpi.first.Config;
-import edu.wpi.first.cameraserver.CameraServer;
+import frc.team3388.vision.config.CameraConfig;
+import frc.team3388.vision.config.Config;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CameraControl {
+
     private final Config mConfig;
 
     public CameraControl(Config config) {

@@ -1,4 +1,4 @@
-package edu.wpi.first;
+package frc.team3388.vision.config;
 
 import org.opencv.core.Range;
 

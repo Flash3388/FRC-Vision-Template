@@ -1,16 +1,19 @@
-package main;
+package frc.team3388.vision;
 
-import com.flash3388.vision.ColorSettings;
+import com.beans.IntProperty;
+import com.flash3388.flashlib.vision.processing.color.ColorRange;
+import com.flash3388.flashlib.vision.processing.color.HsvColorSettings;
+import com.flash3388.frc.nt.beans.NtPropertyFactory;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.Config;
-import edu.wpi.first.NtMode;
-import edu.wpi.first.VisionConfig;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.team3388.vision.config.Config;
+import frc.team3388.vision.config.NtMode;
+import frc.team3388.vision.config.VisionConfig;
 
 import java.util.List;
 
@@ -35,7 +38,7 @@ public class NtControl {
     }
 
     public void initializeCameraSwitching(List<VideoSource> cameras) {
-        MjpegServer cameraServer = CameraServer.getInstance().addSwitchedCamera("jetson_cam");
+        MjpegServer cameraServer = CameraServer.getInstance().addSwitchedCamera("camera");
         NetworkTable cameraControlTable = mNtInstance.getTable("cameraCtrl");
         NetworkTableEntry cameraSwitchingEntry = cameraControlTable.getEntry("camera");
 
@@ -43,8 +46,9 @@ public class NtControl {
         cameraSwitchingEntry.setDouble(0);
         cameraSwitchingEntry.addListener(notification -> {
             try {
-                cameraServer.setSource(cameras.get((int)notification.value.getDouble()));
-            } catch (IndexOutOfBoundsException ignored) {}
+                cameraServer.setSource(cameras.get((int) notification.value.getDouble()));
+            } catch (IndexOutOfBoundsException ignored) {
+            }
         }, EntryListenerFlags.kUpdate);
     }
 
@@ -60,11 +64,31 @@ public class NtControl {
         }, EntryListenerFlags.kUpdate);
     }
 
-    public ColorSettings colorSettings() {
+    public HsvColorSettings colorSettings() {
         VisionConfig visionConfig = mConfig.getVisionConfig();
-        return ColorSettings.fromTable(
-                mNtInstance.getTable("colorSettings"),
-                visionConfig.getHue(), visionConfig.getSaturation(), visionConfig.getValue()
+        NetworkTable table = mNtInstance.getTable("colorSettings");
+
+        IntProperty hueMin = NtPropertyFactory.newIntProperty(table, "hue.min");
+        hueMin.setAsInt(visionConfig.getHue().start);
+        IntProperty hueMax = NtPropertyFactory.newIntProperty(table, "hue.max");
+        hueMax.setAsInt(visionConfig.getHue().end);
+        IntProperty satMin = NtPropertyFactory.newIntProperty(table, "sat.min");
+        hueMin.setAsInt(visionConfig.getSaturation().start);
+        IntProperty satMax = NtPropertyFactory.newIntProperty(table, "sat.max");
+        hueMin.setAsInt(visionConfig.getSaturation().end);
+        IntProperty valMin = NtPropertyFactory.newIntProperty(table, "val.min");
+        hueMin.setAsInt(visionConfig.getValue().start);
+        IntProperty valMax = NtPropertyFactory.newIntProperty(table, "val.max");
+        hueMin.setAsInt(visionConfig.getValue().end);
+
+        return new HsvColorSettings(
+                new ColorRange(hueMin, hueMax),
+                new ColorRange(satMin, satMax),
+                new ColorRange(valMin, valMax)
         );
+    }
+
+    public NetworkTable getResultsTable() {
+        return mNtInstance.getTable("visionResults");
     }
 }

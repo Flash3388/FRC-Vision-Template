@@ -63,7 +63,7 @@ test {
 }
 
 application {
-    mainClassName = 'main.Main'
+    mainClassName = 'frc.team3388.vision.Main'
     applicationName = 'frcvision'
 }
 
