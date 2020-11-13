@@ -1,28 +1,29 @@
 package frc.team3388.vision.config;
 
-import org.opencv.core.Range;
+import com.google.gson.JsonObject;
+import frc.team3388.vision.VisionType;
 
 public class VisionConfig {
 
-    private final Range mHue;
-    private final Range mSaturation;
-    private final Range mValue;
+    private final ColorConfig mColorConfig;
+    private final VisionType mVisionType;
+    private final JsonObject mExtras;
 
-    public VisionConfig(Range hue, Range saturation, Range value) {
-        mHue = hue;
-        mSaturation = saturation;
-        mValue = value;
+    public VisionConfig(ColorConfig colorConfig, VisionType visionType, JsonObject extras) {
+        mColorConfig = colorConfig;
+        mVisionType = visionType;
+        mExtras = extras;
     }
 
-    public Range getHue() {
-        return mHue;
+    public ColorConfig getColorConfig() {
+        return mColorConfig;
     }
 
-    public Range getSaturation() {
-        return mSaturation;
+    public VisionType getVisionType() {
+        return mVisionType;
     }
 
-    public Range getValue() {
-        return mValue;
+    public JsonObject getExtras() {
+        return mExtras;
     }
 }

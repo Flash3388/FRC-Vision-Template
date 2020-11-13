@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import frc.team3388.vision.VisionType;
 import org.opencv.core.Range;
 
 import java.io.BufferedReader;
@@ -11,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ConfigLoader {
@@ -137,11 +139,33 @@ public class ConfigLoader {
         }
 
         JsonObject visionRoot = rootObject.getAsJsonObject("vision");
-        Range hue = parseRange(visionRoot, "hue");
-        Range saturation = parseRange(visionRoot, "saturation");
-        Range value = parseRange(visionRoot, "value");
+        ColorConfig colorConfig = parseColorConfig(visionRoot);
 
-        return new VisionConfig(hue, saturation, value);
+        if (!visionRoot.has("type")) {
+            throw new ConfigLoadException("missing 'type' for 'vision'");
+        }
+        String type = visionRoot.get("type").getAsString();
+        VisionType visionType;
+        try {
+            visionType = VisionType.valueOf(type);
+        } catch (IllegalArgumentException e) {
+            throw new ConfigLoadException("unknown value for 'type' in 'vision'. supported: " + Arrays.asList(VisionType.values()));
+        }
+
+        return new VisionConfig(colorConfig, visionType, visionRoot);
+    }
+
+    private ColorConfig parseColorConfig(JsonObject rootObject) throws ConfigLoadException {
+        if (!rootObject.has("color")) {
+            throw new ConfigLoadException("missing 'color'");
+        }
+
+        JsonObject root = rootObject.getAsJsonObject("color");
+        Range hue = parseRange(root, "hue");
+        Range saturation = parseRange(root, "saturation");
+        Range value = parseRange(root, "value");
+
+        return new ColorConfig(hue, saturation, value);
     }
 
     private Range parseRange(JsonObject rootObject, String memberName) throws ConfigLoadException {

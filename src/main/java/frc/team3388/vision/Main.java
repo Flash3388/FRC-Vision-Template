@@ -7,6 +7,7 @@ package frc.team3388.vision;
 /*----------------------------------------------------------------------------*/
 
 import com.castle.util.throwables.ThrowableHandler;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.team3388.vision.config.Config;
 import frc.team3388.vision.config.ConfigLoader;
 
@@ -48,13 +49,14 @@ public final class Main {
             configFilePath = args[0];
         }
 
-        ThrowableHandler throwableHandler = (t)-> {};
+        ThrowableHandler throwableHandler = Throwable::printStackTrace;
         try {
             Config config = new ConfigLoader(new File(configFilePath)).load();
             CameraControl cameraControl = new CameraControl(config);
-            NtControl ntControl = new NtControl(config);
+            NtControl ntControl = new NtControl(config, NetworkTableInstance.getDefault());
+            VisionFactory visionFactory = config.getVisionConfig().getVisionType().createFactory();
 
-            FrcVision frcVision = new FrcVision(config, cameraControl, ntControl, throwableHandler);
+            FrcVision frcVision = new FrcVision(config, cameraControl, ntControl, visionFactory, throwableHandler);
             frcVision.startVision();
         } catch (Throwable e) {
             e.printStackTrace();

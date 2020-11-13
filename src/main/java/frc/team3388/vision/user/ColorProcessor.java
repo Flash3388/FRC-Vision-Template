@@ -4,10 +4,10 @@ import com.flash3388.flashlib.vision.cv.CvProcessing;
 import com.flash3388.flashlib.vision.processing.Processor;
 import com.flash3388.flashlib.vision.processing.color.ColorRange;
 import com.flash3388.flashlib.vision.processing.color.HsvColorSettings;
-import org.opencv.core.Mat;
+import frc.team3388.vision.VisionData;
 import org.opencv.core.Range;
 
-public class ColorProcessor implements Processor<Mat, Mat> {
+public class ColorProcessor implements Processor<VisionData, VisionData> {
 
     private final HsvColorSettings mHsvColorSettings;
     private final CvProcessing mCvProcessing;
@@ -18,12 +18,12 @@ public class ColorProcessor implements Processor<Mat, Mat> {
     }
 
     @Override
-    public Mat process(Mat input) {
+    public VisionData process(VisionData input) {
         Range hue = colorRangeToRange(mHsvColorSettings.getHue());
         Range saturation = colorRangeToRange(mHsvColorSettings.getSaturation());
         Range value = colorRangeToRange(mHsvColorSettings.getValue());
 
-        mCvProcessing.filterMatColors(input, input, hue, saturation, value);
+        mCvProcessing.filterMatColors(input.getImage(), input.getImage(), hue, saturation, value);
 
         return input;
     }
