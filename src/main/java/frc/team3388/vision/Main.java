@@ -10,8 +10,8 @@ import com.castle.util.throwables.ThrowableHandler;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.team3388.vision.config.Config;
 import frc.team3388.vision.config.ConfigLoader;
-import frc.team3388.vision.control.NtControl;
 import frc.team3388.vision.control.CameraControl;
+import frc.team3388.vision.control.NtControl;
 import frc.team3388.vision.control.VisionFactory;
 
 import java.io.File;
