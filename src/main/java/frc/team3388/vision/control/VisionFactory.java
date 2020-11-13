@@ -1,4 +1,4 @@
-package frc.team3388.vision;
+package frc.team3388.vision.control;
 
 import edu.wpi.cscore.VideoSource;
 import frc.team3388.vision.config.Config;

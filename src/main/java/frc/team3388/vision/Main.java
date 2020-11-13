@@ -10,6 +10,9 @@ import com.castle.util.throwables.ThrowableHandler;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.team3388.vision.config.Config;
 import frc.team3388.vision.config.ConfigLoader;
+import frc.team3388.vision.control.NtControl;
+import frc.team3388.vision.control.CameraControl;
+import frc.team3388.vision.control.VisionFactory;
 
 import java.io.File;
 /*
@@ -41,12 +44,15 @@ import java.io.File;
 
 public final class Main {
 
-    private static final String DEFAULT_CONFIG_FILE_PATH = "/boot/frc.json";
+    private static final String DEFAULT_CONFIG_FILE_PATH = "frc.json";
 
     public static void main(String[] args) {
-        String configFilePath = DEFAULT_CONFIG_FILE_PATH;
+        String configFilePath;
         if (args.length > 0) {
             configFilePath = args[0];
+        } else {
+            String workingDirectory = System.getenv("user.dir");
+            configFilePath = workingDirectory.concat("/").concat(DEFAULT_CONFIG_FILE_PATH);
         }
 
         ThrowableHandler throwableHandler = Throwable::printStackTrace;
@@ -57,7 +63,7 @@ public final class Main {
             VisionFactory visionFactory = config.getVisionConfig().getVisionType().createFactory();
 
             FrcVision frcVision = new FrcVision(config, cameraControl, ntControl, visionFactory, throwableHandler);
-            frcVision.startVision();
+            frcVision.run();
         } catch (Throwable e) {
             e.printStackTrace();
         }

@@ -1,9 +1,10 @@
-package frc.team3388.vision;
+package frc.team3388.vision.control;
 
 import com.castle.util.throwables.ThrowableHandler;
 import com.flash3388.flashlib.vision.Pipeline;
 import com.flash3388.flashlib.vision.Source;
 import com.flash3388.flashlib.vision.SourcePoller;
+import frc.team3388.vision.VisionData;
 
 public class VisionRunner {
 

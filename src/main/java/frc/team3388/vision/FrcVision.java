@@ -12,7 +12,13 @@ import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
 import frc.team3388.vision.config.Config;
+import frc.team3388.vision.control.NtControl;
+import frc.team3388.vision.control.CameraControl;
+import frc.team3388.vision.control.Vision;
+import frc.team3388.vision.control.VisionFactory;
+import frc.team3388.vision.control.VisionRunner;
 import frc.team3388.vision.user.ColorProcessor;
+import frc.team3388.vision.user.HsvRange;
 import frc.team3388.vision.user.UserAnalyser;
 import frc.team3388.vision.user.UserProcessor;
 
@@ -40,7 +46,8 @@ public class FrcVision {
         mThrowableHandler = throwableHandler;
     }
 
-    public void startVision() {
+    public void run() {
+        mNtControl.startNetworkTables();
         List<VideoSource> cameras = mCameraControl.startCameras();
 
         if (cameras.size() >= 1) {
@@ -57,7 +64,7 @@ public class FrcVision {
 
         CvSource postProcessed = CameraServer.getInstance().putVideo("processed", 480, 320);
         Source<VisionData> source = vision.getSource();
-        HsvColorSettings colorSettings = vision.configureColorSettings();
+        HsvRange colorSettings = vision.configureColorSettings();
         CvProcessing cvProcessing = new CvProcessing();
 
         Processor<VisionData, Optional<? extends Scorable>> processor = new ColorProcessor(colorSettings, cvProcessing)

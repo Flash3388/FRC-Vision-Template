@@ -1,62 +1,127 @@
-# frcvision-rpi
+# FRC Vision
 
-Testing vision using the raspberry PI image for FRC
+Vision code for FRC which runs separately from the robot code. The code will connect to network tables and allow
+running and configuring vision code based on the `VisionControl` interface from FlashLib.
 
-Using the example provided with the image, we set up a server which performs a simple processing on an image from a camera, and uploads it to the camera server.
+## Configuration
 
-# What does the code do?
+The configuration file allows editing different aspects of the code functionality. See [frc.json](frc.json) for example.
 
-The code will start a camera server, using pre-defined configuration, and run a vision processing thread on the first
-defined camera.
+The configuration is made up of several parts in hierarchy:
+- root: all the settings
+    - team: the team number
+    - ntmode: configuration of the network tables run mode
+    - cameras: configurations for the connected cameras, should have information about all the cameras in a format matching
+      the following template:
+      ```JSON
+      "cameras": [
+          {
+            "name": "a name for the camera. it's purely for debugging reasons",
+            "path": "device path, like /dev/video0",
+            "pixel format": "MJPEG, YUYV, etc || optional",
+            "width": "width of the camera resolution || optional",
+            "height": "height of the camera resolution  || optional",
+            "fps": "frames per second  || optional",
+            "brightness": "brightness precentage || optional",
+            "white balance": "auto, hold, specific value, etc || optional",
+            "exposure": "auto, hold, specific value, etc  || optional",
+            "fov": "field of view in radians || optional"
+            "properties": [
+                {
+                  "name": "custom prop name",
+                  "value": "custom prop value"
+                }
+            ]
+          }
+      ]
+      ```
+    - target: information about the target to find matching the following format:
+      ```JSON
+      "target": {
+          "realWidth": "real life width in cm",
+          "dimensionsRatio": "ratio between real life width and height"
+      }
+      ```
+    - vision: configuration for the vision code running matching the following format:
+      ```JSON
+      "vision": {
+          "color": {
+              "hue": {
+                  "min": "initial min hue value (0->180)",
+                  "max": "initial max hue value (0->180)",
+              },
+              "saturation": {
+                  "min": "initial min saturation value (0->255)",
+                  "max": "initial max saturation value (0->255)",
+              },
+              "value": {
+                  "min": "initial min value value (0->255)",
+                  "max": "initial max value value (0->255)",
+              }
+          },
+          "type": "type of vision control, which determine how to use the cameras. Based on VisionType enum",
+          "camera": "only for SINGLE_CAMERA type - specifies index of camera to use from among the camera configs"
+      }
+      ```
+        - `VisionType` indicates how the vision should reflect when having several cameras.
+            - `SINGLE_CAMERA`: vision code will only run on one camera while the rest will simply be used for looking.
+            - `SWITCHED_CAMERA`: vision code will use the currently selected camera. Switching cameras will affect vision as well.
+      
+## Vision Options
 
-The vision processing will take an image from the camera, grayscale it, and upload it to the camera server into a different stream.
+The supported `VisionOption` types are:
+- `StandardVisionOptions.DEBUG`: additional debug information during the vision code
+- `StandardVisionOptions.EXPOSURE`: exposure setting of the camera used for vision
 
-# Configuration
+In addition, there are custom vision options:
+- `ExtraVisionOptions.SELECTED_CAMERA`: index for which camera to show. depending on the `VisionType` used this 
+  might affect vision or simply affect what is shown by the MJpeg server
+- `ExtraVisionOptions.HUE_MIN`: min hue value for the color filtering
+- `ExtraVisionOptions.HUE_MAX`: max hue value for the color filtering
+- `ExtraVisionOptions.SATURATION_MIN`: min saturation value for the color filtering
+- `ExtraVisionOptions.SATURATION_MAX`: max saturation value for the color filtering
+- `ExtraVisionOptions.VALUE_MIN`: min value value for the color filtering
+- `ExtraVisionOptions.VALUE_MAX`: max value value for the color filtering
 
-The configuration is defined in `/boot/frc.json` by default, and contains the following information:
+## Robot Interaction
 
-- team number
-- status of the network tables instance used (for communicating with the robot - server or client)
-- settings for cameras to display in the camera server
+To interact with this vision code from the robot, use `NtRemoteVisionControl` from `flashlib.frc.nt`
+which implements remote `VisionControl` through network-tables.
+```Java
+VisionControl visionControl = new NtRemoteVisionControl("vision");
+visionControl.start();
 
-```JSON
-{
-	"team": <team number>,
-	"ntmode": <"client" or "server", "client" if unspecified>
-	"cameras": [
-	   {
-	       "name": <camera name>
-	       "path": <path, e.g. "/dev/video0">
-	       "pixel format": <"MJPEG", "YUYV", etc>   // optional
-	       "width": <video mode width>              // optional
-	       "height": <video mode height>            // optional
-	       "fps": <video mode fps>                  // optional
-	       "brightness": <percentage brightness>    // optional
-	       "white balance": <"auto", "hold", value> // optional
-	       "exposure": <"auto", "hold", value>      // optional
-	       "properties": [                          // optional
-	           {
-	               "name": <property name>
-	               "value": <property value>
-	           }
-	       ],
-	       "fov": <field of view of the camera in radians>
-	   }
-	],
-	"templateMatchingMethod": <value from the TemplateMatchingMethod enum, for example "SQDIFF_NORMED">,
-	"visionTemplatePath": <full path to the template image>,
-	"templateMatchingScaleFactor": <scale factor between the original image and the template, for example 2.0>
-}
+visionControl.setOption(StandardVisionOption.DEBUG, true);
+Optional<VisionResult> result = visionControl.getLatestResult(true);
+result.ifPresent((value)-> System.out.println(value.getAnalysis()));
 ```
 
-# Building
+See [this example](https://github.com/Flash3388/FlashFRC/tree/development/examples/vision/robot-nt-vision) for more.
 
-To build the code run the gradle wrapper: `./gradlew build` for UNIX systems and `gradlew.bat build` for Windows systems.
+## Build and Deploy
 
-# Deploy
+Building and deploying is based on _gradle_ tasks. Run the wrapper (`./gradlew` on UNIX and `gradlew.bat` on Windows)
+with the tasks `build` to build and `deploy` to deploy.
 
-To deploy the code to the Raspberry PI, simple run `./deploy.sh`. This script will use `scp` to copy both the compiled code and the `runCamera` script.
+Deploying will push the compiled code and the [configuration file](frc.json) to a place specified by gradle configuration, as seen
+in [gradle.properties](gradle.properties):
+- `DEPLOY_PATH`: absolute path on the remote to deploy the code. Should exist. Will be the parent folder of the code.
+- `DEPLOY_HOST`: hostname of the remote device to deploy to.
+- `DEPLOY_USER`: username to connect to on the remote when deploying.
+- `CODE_EXTRACT_FOLDER`: name of the folder to extract to code into when deploying. Will contain the code distribution.
 
-# Running
+For security reasons, the password to connect to the deploy target is not saved in gradle.properties and needs to be
+specified manually when deploying:
+```shell script
+./gradlew deploy -PtargetPassword=somepassword
+```
 
-Using `ssh` run the `runInteractive` script in `/home/pi`.
+### Running
+
+To run the deployed code, run the _gradle_ task `runRemote`.
+
+For security reasons, the password to connect to the deploy target is not saved in gradle.properties and needs to be
+specified manually when deploying:
+```shell script
+./gradlew runRemote -PtargetPassword=somepassword
+```

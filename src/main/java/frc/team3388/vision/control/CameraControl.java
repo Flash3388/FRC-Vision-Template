@@ -1,4 +1,4 @@
-package frc.team3388.vision;
+package frc.team3388.vision.control;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

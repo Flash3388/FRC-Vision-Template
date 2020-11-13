@@ -78,13 +78,17 @@ task deploy {
         ssh.run {
             session(remotes.target) {
                 def distributionName = "${application.applicationName}.zip"
+                def extractFolder = "${DEPLOY_PATH}/${CODE_EXTRACT_FOLDER}"
 
                 // delete old version
                 execute "rm -rf ${DEPLOY_PATH}/${application.applicationName}"
 
                 // upload new code
                 put from: "${project.buildDir}/distributions/${distributionName}", into: "$DEPLOY_PATH"
-                execute "unzip ${DEPLOY_PATH}/${distributionName}"
+                execute "unzip ${DEPLOY_PATH}/${distributionName} -d ${extractFolder}"
+
+                // upload configuration
+                put from: rootProject.file('frc.json').absolutePath, into: "$extractFolder"
             }
         }
     }
@@ -95,7 +99,9 @@ task runRemote {
     doLast {
         ssh.run {
             session(remotes.target) {
-                execute "cd ${DEPLOY_PATH}/${application.applicationName}"
+                def extractFolder = "${DEPLOY_PATH}/${CODE_EXTRACT_FOLDER}"
+
+                execute "cd ${extractFolder}"
                 execute "./bin/${application.applicationName}"
             }
         }

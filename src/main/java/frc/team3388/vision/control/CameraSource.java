@@ -1,4 +1,4 @@
-package frc.team3388.vision;
+package frc.team3388.vision.control;
 
 import com.beans.util.function.Suppliers;
 import com.flash3388.flashlib.vision.Source;
@@ -6,6 +6,7 @@ import com.flash3388.flashlib.vision.VisionException;
 import com.flash3388.frc.nt.vision.NtVisionServer;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.VideoSource;
+import frc.team3388.vision.VisionData;
 import frc.team3388.vision.config.CameraConfig;
 import org.opencv.core.Mat;
 

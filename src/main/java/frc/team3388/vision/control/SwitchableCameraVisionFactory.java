@@ -1,4 +1,4 @@
-package frc.team3388.vision;
+package frc.team3388.vision.control;
 
 import com.beans.Property;
 import com.beans.properties.atomic.AtomicProperty;
@@ -8,6 +8,7 @@ import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
+import frc.team3388.vision.ExtraVisionOptions;
 import frc.team3388.vision.config.CameraConfig;
 import frc.team3388.vision.config.Config;
 
@@ -23,7 +24,7 @@ public class SwitchableCameraVisionFactory implements VisionFactory {
         Property<CameraConfig> cameraConfig = new AtomicProperty<>();
 
         initializeVisionOptions(visionServer, cameraServer, cameras, config.getCameraConfigs(), sink, cameraConfig);
-        return new Vision(ntControl, visionServer, cameraServer, new CameraSource(sink, cameraConfig, visionServer));
+        return new Vision(config, visionServer, cameraServer, new CameraSource(sink, cameraConfig, visionServer));
     }
 
     private MjpegServer initializeCameraServer(List<VideoSource> cameras) {

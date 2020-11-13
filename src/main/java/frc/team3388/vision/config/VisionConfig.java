@@ -1,7 +1,6 @@
 package frc.team3388.vision.config;
 
 import com.google.gson.JsonObject;
-import frc.team3388.vision.VisionType;
 
 public class VisionConfig {
 

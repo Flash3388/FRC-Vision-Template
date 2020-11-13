@@ -1,10 +1,11 @@
-package frc.team3388.vision;
+package frc.team3388.vision.control;
 
 import com.flash3388.frc.nt.vision.NtVisionServer;
 import com.flash3388.frc.nt.vision.StandardVisionOptions;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
+import frc.team3388.vision.ExtraVisionOptions;
 import frc.team3388.vision.config.CameraConfig;
 import frc.team3388.vision.config.Config;
 
@@ -23,7 +24,7 @@ public class SingleCameraVisionFactory implements VisionFactory {
         CameraConfig cameraConfig = config.getCameraConfigs().get(cameraIndex);
 
         initializeVisionOptions(visionServer, cameraServer, cameras, camera);
-        return new Vision(ntControl, visionServer, cameraServer, new CameraSource(camera, cameraConfig, visionServer));
+        return new Vision(config, visionServer, cameraServer, new CameraSource(camera, cameraConfig, visionServer));
     }
 
     private MjpegServer initializeCameraServer(List<VideoSource> cameras) {
