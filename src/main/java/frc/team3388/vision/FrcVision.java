@@ -19,6 +19,8 @@ import frc.team3388.vision.user.UserAnalyser;
 import frc.team3388.vision.user.UserProcessor;
 
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class FrcVision {
 
@@ -37,11 +39,12 @@ public class FrcVision {
     }
 
     public void run() {
-        startVisionThread();
-        waitForever();
+        try (VisionRunner runner = startVisionThread()) {
+            waitForever();
+        }
     }
 
-    private void startVisionThread() {
+    private VisionRunner startVisionThread() {
         Source<VisionData> source = mVision.getSource();
         HsvRange colorSettings = mVision.configureColorSettings();
         CvProcessing cvProcessing = new CvProcessing();
@@ -65,15 +68,36 @@ public class FrcVision {
         if (mConfig.getVisionConfig().isAutoStart()) {
             runner.start();
         }
+
+        return runner;
     }
 
     private static void waitForever() {
+        CountDownLatch latch = new CountDownLatch(1);
+        Runtime.getRuntime().addShutdownHook(new LoopReleaseThread(latch));
+
         for (;;) {
             try {
-                Thread.sleep(10000);
+                if (latch.await(10000, TimeUnit.MILLISECONDS)) {
+                    break;
+                }
             } catch (InterruptedException ex) {
-                return;
+                break;
             }
+        }
+    }
+
+    private static class LoopReleaseThread extends Thread {
+
+        private final CountDownLatch mLatch;
+
+        private LoopReleaseThread(CountDownLatch latch) {
+            mLatch = latch;
+        }
+
+        @Override
+        public void run() {
+            mLatch.countDown();
         }
     }
 }

@@ -7,7 +7,7 @@ import com.flash3388.flashlib.vision.Pipeline;
 import com.flash3388.flashlib.vision.Source;
 import frc.team3388.vision.VisionData;
 
-public class VisionRunner {
+public class VisionRunner implements AutoCloseable {
 
     private final Source<VisionData> mSource;
     private final Pipeline<VisionData> mPipeline;
@@ -37,5 +37,10 @@ public class VisionRunner {
             mVisionThread.interrupt();
             mVisionThread = null;
         }
+    }
+
+    @Override
+    public void close() {
+        stop();
     }
 }
