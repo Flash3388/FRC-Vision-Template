@@ -8,6 +8,7 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
 import frc.team3388.vision.config.CameraConfig;
 import frc.team3388.vision.config.Config;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,8 @@ public class CameraControl implements AutoCloseable {
 
     private final List<VideoSource> mCameras;
 
-    public CameraControl(Config config) {
-        mCameras = startCameras(config);
+    public CameraControl(Config config, Logger logger) {
+        mCameras = startCameras(config, logger);
     }
 
     public int getCameraCount() {
@@ -35,11 +36,11 @@ public class CameraControl implements AutoCloseable {
         closer.close();
     }
 
-    private List<VideoSource> startCameras(Config config) {
+    private List<VideoSource> startCameras(Config config, Logger logger) {
         List<VideoSource> cameras = new ArrayList<>();
         try {
             for (CameraConfig cameraConfig : config.getCameraConfigs()) {
-                cameras.add(startCamera(cameraConfig));
+                cameras.add(startCamera(cameraConfig, logger));
             }
 
             return cameras;
@@ -49,8 +50,8 @@ public class CameraControl implements AutoCloseable {
         }
     }
 
-    private VideoSource startCamera(CameraConfig config) {
-        System.out.printf("Starting camera %s on %s%n", config.getName(), config.getPath());
+    private VideoSource startCamera(CameraConfig config, Logger logger) {
+        logger.info("Starting camera {} on {}", config.getName(), config.getPath());
 
         VideoSource camera = new UsbCamera(config.getName(), config.getPath());
         try {

@@ -17,6 +17,7 @@ import frc.team3388.vision.control.Controls;
 import frc.team3388.vision.control.Vision;
 import frc.team3388.vision.user.UserAnalyser;
 import frc.team3388.vision.user.UserProcessor;
+import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
@@ -29,12 +30,15 @@ public class FrcVision {
     private final Controls mControls;
     private final Vision mVision;
     private final Config mConfig;
+    private final Logger mLogger;
     private final ThrowableHandler mThrowableHandler;
 
-    public FrcVision(Controls controls, Vision vision, Config config, ThrowableHandler throwableHandler) {
+    public FrcVision(Controls controls, Vision vision, Config config,
+                     Logger logger, ThrowableHandler throwableHandler) {
         mControls = controls;
         mVision = vision;
         mConfig = config;
+        mLogger = logger;
         mThrowableHandler = throwableHandler;
     }
 
@@ -72,19 +76,23 @@ public class FrcVision {
         return runner;
     }
 
-    private static void waitForever() {
+    private void waitForever() {
         CountDownLatch latch = new CountDownLatch(1);
         Runtime.getRuntime().addShutdownHook(new LoopReleaseThread(latch));
 
+        mLogger.debug("Entering wait loop");
         for (;;) {
             try {
                 if (latch.await(10000, TimeUnit.MILLISECONDS)) {
+                    mLogger.debug("Latch signaled stop");
                     break;
                 }
             } catch (InterruptedException ex) {
+                mLogger.debug("Wait interrupted");
                 break;
             }
         }
+        mLogger.debug("Done wait loop");
     }
 
     private static class LoopReleaseThread extends Thread {

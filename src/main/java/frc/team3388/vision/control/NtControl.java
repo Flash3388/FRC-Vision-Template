@@ -5,15 +5,16 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.team3388.vision.config.Config;
 import frc.team3388.vision.config.NtMode;
+import org.slf4j.Logger;
 
 public class NtControl implements AutoCloseable {
 
     private final NetworkTableInstance mInstance;
     private final NtVisionServer mVisionServer;
 
-    public NtControl(Config config) {
+    public NtControl(Config config, Logger logger) {
         mInstance = NetworkTableInstance.getDefault();
-        startNetworkTables(config);
+        startNetworkTables(config, logger);
 
         mVisionServer = new NtVisionServer(mInstance.getTable("vision"));
     }
@@ -26,12 +27,12 @@ public class NtControl implements AutoCloseable {
         return mVisionServer;
     }
 
-    private void startNetworkTables(Config config) {
+    private void startNetworkTables(Config config, Logger logger) {
         if (config.getNtMode() == NtMode.SERVER) {
-            System.out.println("Setting up NetworkTables server");
+            logger.info("Setting up NetworkTables server");
             mInstance.startServer();
         } else {
-            System.out.println("Setting up NetworkTables client for team " + config.getTeamNumber());
+            logger.info("Setting up NetworkTables client for team {}", config.getTeamNumber());
             mInstance.startClientTeam(config.getTeamNumber());
         }
     }
