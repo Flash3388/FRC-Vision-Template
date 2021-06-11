@@ -83,17 +83,16 @@ task deploy {
         ssh.run {
             session(remotes.target) {
                 def distributionName = "${application.applicationName}.zip"
-                def extractFolder = "${DEPLOY_PATH}/${CODE_EXTRACT_FOLDER}"
 
                 // delete old version
                 execute "rm -rf ${DEPLOY_PATH}/${application.applicationName}"
 
                 // upload new code
                 put from: "${project.buildDir}/distributions/${distributionName}", into: "$DEPLOY_PATH"
-                execute "unzip ${DEPLOY_PATH}/${distributionName} -d ${extractFolder}"
+                execute "unzip ${DEPLOY_PATH}/${distributionName} -d ${DEPLOY_PATH}"
 
                 // upload configuration
-                put from: rootProject.file('frc.json').absolutePath, into: "$extractFolder"
+                put from: rootProject.file('frc.json').absolutePath, into: "${DEPLOY_PATH}"
             }
         }
     }
@@ -104,10 +103,10 @@ task runRemote {
     doLast {
         ssh.run {
             session(remotes.target) {
-                def extractFolder = "${DEPLOY_PATH}/${CODE_EXTRACT_FOLDER}"
-                execute "pkill -15 java"
-                execute "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64"
-                execute "${extractFolder}/${application.applicationName}/bin/${application.applicationName} ${DEPLOY_PATH}/frc.json"
+                // kill any previous processes
+                execute "ps -fade | grep -i java | grep -v grep | xargs -n 1 | sed -n 2p | xargs -r kill -15"
+                execute "${DEPLOY_PATH}/${application.applicationName}/bin/${application.applicationName} " +
+                        "--config-file=${DEPLOY_PATH}/frc.json"
             }
         }
     }
