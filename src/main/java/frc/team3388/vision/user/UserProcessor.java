@@ -61,6 +61,8 @@ public class UserProcessor implements Processor<VisionData, Optional<? extends S
             }
         }
 
+        mOutputPipeline.process(mOutputMat);
+
         return Optional.empty();
     }
 

@@ -33,10 +33,12 @@ public class CameraSource implements Source<VisionData> {
         mCvSink.setSource(camera);
     }
 
-                        @Override
+    @Override
     public VisionData get() throws VisionException {
         CameraConfig config = mConfigProperty.get();
-        mCvSink.grabFrame(mImage);
+        if (mCvSink.grabFrame(mImage) == 0) {
+            throw new VisionException(mCvSink.getError());
+        }
 
         return new VisionData(mImage, config, mVisionServer);
     }

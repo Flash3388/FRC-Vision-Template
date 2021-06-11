@@ -1,9 +1,12 @@
 package frc.team3388.vision.config;
 
+import com.castle.reflect.Types;
+import com.flash3388.flashlib.vision.control.VisionOption;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import org.opencv.core.Range;
 
 import java.io.BufferedReader;
@@ -12,14 +15,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConfigLoader {
 
     private final File mConfigFile;
+    private final KnownVisionOptions mKnownVisionOptions;
 
     public ConfigLoader(File configFile) {
         mConfigFile = configFile;
+        mKnownVisionOptions = new KnownVisionOptions();
     }
 
     public Config load() throws ConfigLoadException {
@@ -151,7 +158,14 @@ public class ConfigLoader {
             throw new ConfigLoadException("unknown value for 'type' in 'vision'. supported: " + Arrays.asList(VisionType.values()));
         }
 
-        return new VisionConfig(colorConfig, visionType, visionRoot);
+        boolean autoStart = false;
+        if (visionRoot.has("autoStart")) {
+            autoStart = visionRoot.get("autoStart").getAsBoolean();
+        }
+
+        VisionOptionsConfig optionsConfig = parseVisionOptions(rootObject);
+
+        return new VisionConfig(colorConfig, visionType, autoStart, optionsConfig, visionRoot);
     }
 
     private ColorConfig parseColorConfig(JsonObject rootObject) throws ConfigLoadException {
@@ -193,5 +207,43 @@ public class ConfigLoader {
         }
 
         return new TargetConfig(rootObject.getAsJsonObject("target"));
+    }
+
+    private VisionOptionsConfig parseVisionOptions(JsonObject rootObject) throws ConfigLoadException {
+        if (!rootObject.has("options")) {
+            return new VisionOptionsConfig();
+        }
+
+        rootObject = rootObject.getAsJsonObject("options");
+
+        Map<String, VisionOptionConfig<?>> options = new HashMap<>();
+        for (Map.Entry<String, JsonElement> entry : rootObject.entrySet()) {
+            options.put(entry.getKey(),
+                    parseVisionOption(entry.getValue(), entry.getKey()));
+        }
+
+        return new VisionOptionsConfig(options);
+    }
+
+    private VisionOptionConfig<?> parseVisionOption(JsonElement element, String name) throws ConfigLoadException {
+        VisionOption<?> option = mKnownVisionOptions.find(name);
+        if (!element.isJsonPrimitive()) {
+            throw new ConfigLoadException("expected primitive");
+        }
+
+        Object value = parseByType(element.getAsJsonPrimitive(), option.valueType());
+        return new VisionOptionConfig(option, value);
+    }
+
+    private Object parseByType(JsonPrimitive element, Class<?> type) throws ConfigLoadException {
+        if (element.isBoolean() && type.equals(Boolean.class)) {
+            return element.getAsBoolean();
+        } else if (element.isNumber() && type.getSuperclass().equals(Number.class)) {
+            return Types.smartCast(element.getAsNumber(), type);
+        } else if (element.isString() && type.equals(String.class)) {
+            return element.getAsString();
+        }
+
+        throw new ConfigLoadException("Can't parse " + element + " to " + type);
     }
 }

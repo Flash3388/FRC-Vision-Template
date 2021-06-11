@@ -3,27 +3,25 @@ package frc.team3388.vision.control;
 import com.flash3388.flashlib.vision.Source;
 import com.flash3388.flashlib.vision.processing.analysis.Analysis;
 import com.flash3388.frc.nt.vision.NtVisionServer;
-import edu.wpi.cscore.MjpegServer;
 import frc.team3388.vision.ExtraVisionOptions;
 import frc.team3388.vision.VisionData;
 import frc.team3388.vision.config.ColorConfig;
 import frc.team3388.vision.config.Config;
+import frc.team3388.vision.control.VisionRunner;
 import frc.team3388.vision.user.HsvRange;
 
 import java.util.function.Consumer;
 
 public class Vision {
 
-    private final Config mConfig;
-    private final NtVisionServer mVisionServer;
-    private final MjpegServer mCameraServer;
     private final Source<VisionData> mSource;
+    private final NtVisionServer mVisionServer;
+    private final Config mConfig;
 
-    public Vision(Config config, NtVisionServer visionServer, MjpegServer cameraServer, Source<VisionData> source) {
-        mConfig = config;
-        mVisionServer = visionServer;
-        mCameraServer = cameraServer;
+    public Vision(Source<VisionData> source, NtVisionServer visionServer, Config config) {
         mSource = source;
+        mVisionServer = visionServer;
+        mConfig = config;
     }
 
     public Source<VisionData> getSource() {

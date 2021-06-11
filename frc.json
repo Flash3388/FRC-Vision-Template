@@ -32,6 +32,10 @@
             }
         },
         "type": "SINGLE_CAMERA",
-        "camera": 0
+        "camera": 0,
+        "autoStart": true,
+        "options": {
+            "debug": false
+        }
     }
 }

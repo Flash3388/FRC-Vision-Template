@@ -13,6 +13,9 @@ repositories {
     maven {
         url('https://frcmaven.wpi.edu/artifactory/release')
     }
+    maven {
+        url('https://oss.sonatype.org/content/repositories/snapshots')
+    }
 }
 
 remotes {
@@ -30,6 +33,8 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: project.file('libs'))
 
     implementation "com.google.code.gson:gson:2.8.5"
+    implementation group: 'net.sourceforge.argparse4j', name: 'argparse4j', version: '0.8.1'
+
     implementation ("com.flash3388.flashlib:flashlib.vision.cv:$FLASHLIB_VERSION") {
         exclude group: 'org.openpnp'
     }
@@ -100,9 +105,9 @@ task runRemote {
         ssh.run {
             session(remotes.target) {
                 def extractFolder = "${DEPLOY_PATH}/${CODE_EXTRACT_FOLDER}"
-
-                execute "cd ${extractFolder}"
-                execute "./bin/${application.applicationName}"
+                execute "pkill -15 java"
+                execute "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64"
+                execute "${extractFolder}/${application.applicationName}/bin/${application.applicationName} ${DEPLOY_PATH}/frc.json"
             }
         }
     }

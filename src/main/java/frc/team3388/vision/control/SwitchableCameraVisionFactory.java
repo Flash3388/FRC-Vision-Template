@@ -5,56 +5,65 @@ import com.beans.properties.atomic.AtomicProperty;
 import com.flash3388.frc.nt.vision.NtVisionServer;
 import com.flash3388.frc.nt.vision.StandardVisionOptions;
 import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.cameraserver.CameraServer;
 import frc.team3388.vision.ExtraVisionOptions;
 import frc.team3388.vision.config.CameraConfig;
 import frc.team3388.vision.config.Config;
+import frc.team3388.vision.config.VisionConfig;
 
 import java.util.List;
 
 public class SwitchableCameraVisionFactory implements VisionFactory {
 
     @Override
-    public Vision create(Config config, List<VideoSource> cameras, NtControl ntControl) {
-        NtVisionServer visionServer = new NtVisionServer("vision");
-        MjpegServer cameraServer = initializeCameraServer(cameras);
+    public Vision create(Config config, Controls controls) {
         CvSink sink = new CvSink("vision-sink");
-        Property<CameraConfig> cameraConfig = new AtomicProperty<>();
+        Property<CameraConfig> cameraConfigProperty = new AtomicProperty<>();
 
-        initializeVisionOptions(visionServer, cameraServer, cameras, config.getCameraConfigs(), sink, cameraConfig);
-        return new Vision(config, visionServer, cameraServer, new CameraSource(sink, cameraConfig, visionServer));
+        int cameraIndex = config.getVisionConfig().getExtras().get("camera").getAsInt();
+        VideoSource camera = controls.getCameraControl().get(cameraIndex);
+        sink.setSource(camera);
+        controls.getServerControl().setMainCameraSource(camera);
+
+        initializeVisionOptions(
+                controls.getNtControl().getVisionServer(),
+                controls.getCameraControl(), controls.getServerControl(),
+                sink, cameraConfigProperty, config.getCameraConfigs(),
+                config.getVisionConfig());
+
+        return new Vision(
+                new CameraSource(sink, cameraConfigProperty, controls.getNtControl().getVisionServer()),
+                controls.getNtControl().getVisionServer(),
+                config
+        );
     }
 
-    private MjpegServer initializeCameraServer(List<VideoSource> cameras) {
-        MjpegServer cameraServer = CameraServer.getInstance().addSwitchedCamera("camera");
-        cameraServer.setSource(cameras.get(0));
-
-        return cameraServer;
-    }
-
-    private void initializeVisionOptions(NtVisionServer visionServer, MjpegServer cameraServer,
-                                         List<VideoSource> cameras, List<CameraConfig> cameraConfigs,
-                                         CvSink sink, Property<CameraConfig> configProperty) {
+    private void initializeVisionOptions(NtVisionServer visionServer, CameraControl cameraControl,
+                                         CameraServerControl cameraServerControl,
+                                         CvSink sink, Property<CameraConfig> cameraConfigProperty,
+                                         List<CameraConfig> cameraConfigs, VisionConfig config) {
         visionServer.addOptionListener(StandardVisionOptions.EXPOSURE, (option, value)-> {
-            cameraServer.getSourceProperty("exposure_absolute").set(value);
+            int selectedCamera = visionServer.getOptionOrDefault(ExtraVisionOptions.SELECTED_CAMERA, 0);
+            VideoSource camera = cameraControl.get(selectedCamera);
+            camera.getProperty("exposure_absolute").set(value);
         });
 
         visionServer.addOptionListener(ExtraVisionOptions.SELECTED_CAMERA, (option, value)-> {
-            if (value < 0 || value >= cameras.size()) {
+            if (value < 0 || value >= cameraControl.getCameraCount()) {
                 return;
             }
 
-            VideoSource camera = cameras.get(value);
-            CameraConfig config = cameraConfigs.get(value);
+            VideoSource camera = cameraControl.get(value);
+            CameraConfig cameraConfig = cameraConfigs.get(value);
 
             sink.setSource(camera);
-            cameraServer.setSource(camera);
-            configProperty.set(config);
+            cameraServerControl.setMainCameraSource(camera);
+            cameraConfigProperty.set(cameraConfig);
 
             int exposureValue = visionServer.getOptionOrDefault(StandardVisionOptions.EXPOSURE, 50);
-            cameraServer.getSourceProperty("exposure_absolute").set(exposureValue);
+            camera.getProperty("exposure_absolute").set(exposureValue);
         });
+
+        config.getOptionsConfig().loadInto(visionServer);
     }
 }

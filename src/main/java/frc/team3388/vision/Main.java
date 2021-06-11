@@ -1,71 +1,80 @@
 package frc.team3388.vision;
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
 
-import com.castle.util.throwables.ThrowableHandler;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import com.castle.util.closeables.Closer;
 import frc.team3388.vision.config.Config;
+import frc.team3388.vision.config.ConfigLoadException;
 import frc.team3388.vision.config.ConfigLoader;
 import frc.team3388.vision.control.CameraControl;
+import frc.team3388.vision.control.CameraServerControl;
+import frc.team3388.vision.control.Controls;
 import frc.team3388.vision.control.NtControl;
+import frc.team3388.vision.control.Vision;
 import frc.team3388.vision.control.VisionFactory;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.io.File;
-/*
-   JSON format:
-   {
-       "team": <team number>,
-       "ntmode": <"client" or "server", "client" if unspecified>
-       "cameras": [
-           {
-               "name": <camera name>
-               "path": <path, e.g. "/dev/video0">
-               "pixel format": <"MJPEG", "YUYV", etc>   // optional
-               "width": <video mode width>              // optional
-               "height": <video mode height>            // optional
-               "fps": <video mode fps>                  // optional
-               "brightness": <percentage brightness>    // optional
-               "white balance": <"auto", "hold", value> // optional
-               "exposure": <"auto", "hold", value>      // optional
-               "properties": [                          // optional
-                   {
-                       "name": <property name>
-                       "value": <property value>
-                   }
-               ]
-           }
-       ]
-   }
- */
 
-public final class Main {
+import static net.sourceforge.argparse4j.impl.Arguments.store;
+import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
-    private static final String DEFAULT_CONFIG_FILE_PATH = "frc.json";
+public class Main {
 
-    public static void main(String[] args) {
-        String configFilePath;
-        if (args.length > 0) {
-            configFilePath = args[0];
-        } else {
-            String workingDirectory = System.getenv("user.dir");
-            configFilePath = workingDirectory.concat("/").concat(DEFAULT_CONFIG_FILE_PATH);
-        }
+    private static final String DEFAULT_CONFIG_FILE_NAME = "frc.json";
 
-        ThrowableHandler throwableHandler = Throwable::printStackTrace;
+    public static void main(String[] args) throws ConfigLoadException, ArgumentParserException {
+        ProgramOptions programOptions = handleArguments(args);
+
+        Config config = new ConfigLoader(programOptions.getConfigFile()).load();
+
+        Closer closer = new Closer();
         try {
-            Config config = new ConfigLoader(new File(configFilePath)).load();
-            CameraControl cameraControl = new CameraControl(config);
-            NtControl ntControl = new NtControl(config, NetworkTableInstance.getDefault());
-            VisionFactory visionFactory = config.getVisionConfig().getVisionType().createFactory();
+            NtControl ntControl = new NtControl(config);
+            closer.add(ntControl);
 
-            FrcVision frcVision = new FrcVision(config, cameraControl, ntControl, visionFactory, throwableHandler);
+            CameraControl cameraControl = new CameraControl(config);
+            closer.add(cameraControl);
+
+            CameraServerControl cameraServerControl = new CameraServerControl();
+            closer.add(cameraServerControl);
+
+            Controls controls = new Controls(ntControl, cameraControl, cameraServerControl);
+
+            VisionFactory visionFactory = config.getVisionConfig().getVisionType().createFactory();
+            Vision vision = visionFactory.create(config, controls);
+
+            FrcVision frcVision = new FrcVision(controls, vision, config, Throwable::printStackTrace);
             frcVision.run();
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        } finally {
+            try {
+                closer.close();
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         }
+    }
+
+    private static ProgramOptions handleArguments(String[] args) throws ArgumentParserException {
+        ArgumentParser parser = ArgumentParsers.newFor("frcvision")
+                .build()
+                .defaultHelp(true)
+                .description("Vision Program for FRC");
+
+        String userDir = System.getProperty("user.dir");
+        parser.addArgument("-c", "--config-file")
+                .required(false)
+                .type(String.class)
+                .action(store())
+                .setDefault(userDir.concat("/").concat(DEFAULT_CONFIG_FILE_NAME))
+                .help("Path to the configuration file of the program");
+
+        Namespace namespace = parser.parseArgs(args);
+        return new ProgramOptions(
+                new File(namespace.getString("config-file"))
+        );
     }
 }
