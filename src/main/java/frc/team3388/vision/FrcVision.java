@@ -17,6 +17,7 @@ import frc.team3388.vision.control.Controls;
 import frc.team3388.vision.control.Vision;
 import frc.team3388.vision.user.UserAnalyser;
 import frc.team3388.vision.user.UserProcessor;
+import org.opencv.core.Mat;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -53,9 +54,13 @@ public class FrcVision {
         HsvRange colorSettings = mVision.configureColorSettings();
         CvProcessing cvProcessing = new CvProcessing();
 
+        Pipeline<Mat> postProcess = new FilterPipeline<>(
+                (mat)-> !mat.empty(),
+                mControls.getServerControl()::putPostProcess);
+
         Processor<VisionData, Optional<? extends Scorable>> processor = new ColorProcessor(colorSettings, cvProcessing)
                 .andThen(new UserProcessor(cvProcessing, mConfig.getTargetConfig(),
-                        mControls.getServerControl()::putPostProcess));
+                        postProcess, mLogger));
 
         Pipeline<VisionData> imagePipeline = new VisionPipeline.Builder<VisionData, Optional<? extends Scorable>>()
                 .process(processor)

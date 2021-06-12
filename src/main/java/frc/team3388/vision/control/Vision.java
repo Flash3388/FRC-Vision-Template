@@ -35,19 +35,19 @@ public class Vision {
             mVisionServer.setOption(ExtraVisionOptions.HUE_MIN, colorConfig.getHue().start);
         }
         if (!mVisionServer.hasOptionValue(ExtraVisionOptions.HUE_MAX)) {
-            mVisionServer.setOption(ExtraVisionOptions.HUE_MIN, colorConfig.getHue().end);
+            mVisionServer.setOption(ExtraVisionOptions.HUE_MAX, colorConfig.getHue().end);
         }
         if (!mVisionServer.hasOptionValue(ExtraVisionOptions.SATURATION_MIN)) {
-            mVisionServer.setOption(ExtraVisionOptions.HUE_MIN, colorConfig.getSaturation().start);
+            mVisionServer.setOption(ExtraVisionOptions.SATURATION_MIN, colorConfig.getSaturation().start);
         }
         if (!mVisionServer.hasOptionValue(ExtraVisionOptions.SATURATION_MAX)) {
-            mVisionServer.setOption(ExtraVisionOptions.HUE_MIN, colorConfig.getSaturation().end);
+            mVisionServer.setOption(ExtraVisionOptions.SATURATION_MAX, colorConfig.getSaturation().end);
         }
         if (!mVisionServer.hasOptionValue(ExtraVisionOptions.VALUE_MIN)) {
-            mVisionServer.setOption(ExtraVisionOptions.HUE_MIN, colorConfig.getValue().start);
+            mVisionServer.setOption(ExtraVisionOptions.VALUE_MIN, colorConfig.getValue().start);
         }
         if (!mVisionServer.hasOptionValue(ExtraVisionOptions.VALUE_MAX)) {
-            mVisionServer.setOption(ExtraVisionOptions.HUE_MIN, colorConfig.getValue().end);
+            mVisionServer.setOption(ExtraVisionOptions.VALUE_MAX, colorConfig.getValue().end);
         }
 
         return new HsvRange(mVisionServer, colorConfig);

@@ -46,4 +46,13 @@ public class RatioTarget implements Scorable {
     public void drawOn(Mat mat) {
         Imgproc.rectangle(mat, mRect.tl(), mRect.br(), new Scalar(78, 150, 200), 2);
     }
+
+    @Override
+    public String toString() {
+        Vector2 center = getCenter();
+        return String.format("RatioTarget{x=%.1f,y=%.1f,score=%.3f}",
+                center.x(),
+                center.y(),
+                score());
+    }
 }

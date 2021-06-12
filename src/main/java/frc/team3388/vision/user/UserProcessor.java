@@ -12,6 +12,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
+import org.slf4j.Logger;
 
 import java.util.Comparator;
 import java.util.List;
@@ -26,14 +27,16 @@ public class UserProcessor implements Processor<VisionData, Optional<? extends S
     private final CvProcessing mCvProcessing;
     private final TargetConfig mTargetConfig;
     private final Pipeline<Mat> mOutputPipeline;
+    private final Logger mLogger;
 
     private final Mat mOutputMat;
 
     public UserProcessor(CvProcessing cvProcessing, TargetConfig targetConfig,
-                         Pipeline<Mat> outputPipeline) {
+                         Pipeline<Mat> outputPipeline, Logger logger) {
         mCvProcessing = cvProcessing;
         mTargetConfig = targetConfig;
         mOutputPipeline = outputPipeline;
+        mLogger = logger;
 
         mOutputMat = new Mat();
     }
@@ -43,27 +46,32 @@ public class UserProcessor implements Processor<VisionData, Optional<? extends S
         Mat image = input.getImage();
         // CameraConfig cameraConfig = input.getCameraConfig();
         boolean isDebugMode = input.getOptionOrDefault(StandardVisionOptions.DEBUG, false);
+        boolean targetFound = false;
 
         List<MatOfPoint> contours = mCvProcessing.detectContours(image);
         Optional<RatioTarget> optional = retrieveBestTarget(contours);
         if (optional.isPresent()) {
             RatioTarget target = optional.get();
             if (target.score() > MIN_SCORE) {
-                Imgproc.cvtColor(image, mOutputMat, Imgproc.COLOR_GRAY2RGB);
-
                 if (isDebugMode) {
+                    Imgproc.cvtColor(image, mOutputMat, Imgproc.COLOR_GRAY2RGB);
                     target.drawOn(mOutputMat);
+                    mOutputPipeline.process(mOutputMat);
+
+                    mLogger.debug("Found target {}", target);
+                    targetFound = true;
                 }
-
-                mOutputPipeline.process(mOutputMat);
-
-                return optional;
             }
         }
 
-        mOutputPipeline.process(mOutputMat);
+        if (!targetFound && isDebugMode) {
+            Imgproc.cvtColor(image, mOutputMat, Imgproc.COLOR_GRAY2RGB);
+            mOutputPipeline.process(mOutputMat);
 
-        return Optional.empty();
+            mLogger.debug("No target");
+        }
+
+        return optional;
     }
 
     private Optional<RatioTarget> retrieveBestTarget(List<MatOfPoint> contours) {

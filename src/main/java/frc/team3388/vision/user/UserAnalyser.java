@@ -32,10 +32,14 @@ public class UserAnalyser implements Analyser<VisionData, Optional<? extends Sco
         Scorable target = postProcess.get();
 
         double distance = AnalysisAlgorithms.measureDistance(
-                originalImage.width(), target.getWidth(),
-                mTargetConfig.getRealWidth(), cameraConfig.getCameraFieldOfViewRadians());
+                originalImage.width(),
+                target.getWidth(),
+                mTargetConfig.getRealWidth(),
+                cameraConfig.getCameraFieldOfViewRadians());
+
         double angle = AnalysisAlgorithms.calculateHorizontalOffsetDegrees2(
-                target.getCenter().x(), originalImage.width(),
+                target.getCenter().x(),
+                originalImage.width(),
                 cameraConfig.getCameraFieldOfViewRadians());
 
         return Optional.of(new Analysis.Builder()

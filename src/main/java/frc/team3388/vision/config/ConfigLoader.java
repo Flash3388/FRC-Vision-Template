@@ -163,7 +163,7 @@ public class ConfigLoader {
             autoStart = visionRoot.get("autoStart").getAsBoolean();
         }
 
-        VisionOptionsConfig optionsConfig = parseVisionOptions(rootObject);
+        VisionOptionsConfig optionsConfig = parseVisionOptions(visionRoot);
 
         return new VisionConfig(colorConfig, visionType, autoStart, optionsConfig, visionRoot);
     }

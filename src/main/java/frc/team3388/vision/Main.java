@@ -76,6 +76,7 @@ public class Main {
         // config
         String userDir = System.getProperty("user.dir");
         parser.addArgument("-f", "--config-file")
+                .dest("config-file")
                 .required(false)
                 .type(String.class)
                 .action(store())
@@ -84,6 +85,7 @@ public class Main {
 
         // logging
         parser.addArgument("--console-log")
+                .dest("console-log")
                 .required(false)
                 .type(booleanType())
                 .action(storeTrue())
@@ -91,6 +93,7 @@ public class Main {
                 .help("Enables log to the console");
 
         parser.addArgument("--file-log")
+                .dest("file-log")
                 .required(false)
                 .type(booleanType())
                 .action(storeTrue())
@@ -98,6 +101,7 @@ public class Main {
                 .help("Enables log to the file");
 
         parser.addArgument("--log-file-out")
+                .dest("log-file-out")
                 .required(false)
                 .type(String.class)
                 .action(store())
@@ -105,6 +109,7 @@ public class Main {
                 .help("File to log into");
 
         parser.addArgument("--log-level")
+                .dest("log-level")
                 .required(false)
                 .type(enumStringType(LogLevel.class))
                 .action(store())

@@ -23,9 +23,12 @@ remotes {
         host = "$DEPLOY_HOST"
         user = "$DEPLOY_USER"
 
+        String suppliedPassword = ''
         if (project.hasProperty('targetPassword')) {
-            password = project.property('targetPassword')
+            suppliedPassword = project.getProperty('targetPassword')
         }
+
+        password = suppliedPassword
     }
 }
 
@@ -74,7 +77,9 @@ application {
 }
 
 run {
-    args project.file('frc.json').absolutePath
+    args "--config-file=${project.file('frc.json').absolutePath}",
+            "--console-log",
+            "--log-level=DEBUG"
 }
 
 task deploy {
@@ -98,15 +103,40 @@ task deploy {
     }
 }
 
+ext {
+    KILL_REMOTE_PROC_COMMAND = "ps -fade | grep -i ${project.jar.archiveBaseName.get()} " +
+            "| grep -v grep | xargs -n 1 " +
+            "| sed -n 2p | xargs -r kill -15"
+}
+
 task runRemote {
     dependsOn tasks.deploy
     doLast {
         ssh.run {
             session(remotes.target) {
                 // kill any previous processes
-                execute "ps -fade | grep -i java | grep -v grep | xargs -n 1 | sed -n 2p | xargs -r kill -15"
-                execute "${DEPLOY_PATH}/${application.applicationName}/bin/${application.applicationName} " +
+                execute KILL_REMOTE_PROC_COMMAND
+
+                // run the last deployed
+                def runCommand =
+                        "${DEPLOY_PATH}/${application.applicationName}/bin/${application.applicationName} " +
                         "--config-file=${DEPLOY_PATH}/frc.json"
+                if (project.hasProperty("runDebug")) {
+                    runCommand += " --log-level=DEBUG --console-log"
+                }
+
+                execute runCommand
+            }
+        }
+    }
+}
+
+task killRemote {
+    doLast {
+        ssh.run {
+            session(remotes.target) {
+                // kill any previous processes
+                execute KILL_REMOTE_PROC_COMMAND
             }
         }
     }
