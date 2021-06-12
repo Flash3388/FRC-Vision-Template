@@ -3,11 +3,19 @@
 Vision code for FRC which runs separately from the robot code. The code will connect to network tables and allow
 running and configuring vision code based on the `VisionControl` interface from FlashLib.
 
+## Program Parameters
+
+- `--config-file=PATH`: sets the path to the configuration file. Default `/home/flash/frc.json`.
+- `--console-log`: enables logging to the console
+- `--file-log`: enables logging to file
+- `--log-file-out=PATH`: sets the log file path. Default `frcvision.log`.
+- `--log-level={DEBUG|INFO|WARN|ERROR}`: sets the log level. Default `ERROR`.
+
 ## Configuration
 
 The configuration file allows editing different aspects of the code functionality. See [frc.json](frc.json) for example.
 
-The configuration is made up of several parts in hierarchy:
+The configuration is made up of several parts in a hierarchy:
 - root: all the settings
     - team: the team number
     - ntmode: configuration of the network tables run mode
@@ -61,6 +69,10 @@ The configuration is made up of several parts in hierarchy:
           },
           "type": "type of vision control, which determine how to use the cameras. Based on VisionType enum",
           "camera": "only for SINGLE_CAMERA type - specifies index of camera to use from among the camera configs"
+          "autoStart": "boolean indicating whether to start vision immediately, or wait for a start command"
+          "options": {
+              "option_name": "value for option"
+          } 
       }
       ```
         - `VisionType` indicates how the vision should reflect when having several cameras.
@@ -108,7 +120,6 @@ in [gradle.properties](gradle.properties):
 - `DEPLOY_PATH`: absolute path on the remote to deploy the code. Should exist. Will be the parent folder of the code.
 - `DEPLOY_HOST`: hostname of the remote device to deploy to.
 - `DEPLOY_USER`: username to connect to on the remote when deploying.
-- `CODE_EXTRACT_FOLDER`: name of the folder to extract to code into when deploying. Will contain the code distribution.
 
 For security reasons, the password to connect to the deploy target is not saved in gradle.properties and needs to be
 specified manually when deploying:
@@ -116,12 +127,30 @@ specified manually when deploying:
 ./gradlew deploy -PtargetPassword=somepassword
 ```
 
+The program will be deployed to `DEPLOY_PATH/frcvision.zip` and then
+extracted to `DEPLOY_PATH/frcvision`.
+
 ### Running
 
-To run the deployed code, run the _gradle_ task `runRemote`.
+To run the deployed code, run the `DEPLOY_PATH/frcvision/bin/frcvision` file.
+Or, run the _gradle_ task `runRemote`.
 
 For security reasons, the password to connect to the deploy target is not saved in gradle.properties and needs to be
 specified manually when deploying:
 ```shell script
 ./gradlew runRemote -PtargetPassword=somepassword
 ```
+
+This will also deploy the code first, kill any previous processes
+of the code running, and then start the new one.
+
+The gradle task will output information from the standard output
+of the remote process. Killing the gradle task (with CTRL+C for example)
+will not kill the remote process.
+
+#### Debug
+
+For additional debug information, use `-PrunDebug=1`. This will
+run the program with the options:
+- `--log-level=DEBUG`
+- `--console-log`
