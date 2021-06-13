@@ -2,6 +2,9 @@ package frc.team3388.vision;
 
 import com.flash3388.flashlib.vision.control.VisionOption;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ExtraVisionOptions {
 
     private ExtraVisionOptions() {}
@@ -17,4 +20,18 @@ public class ExtraVisionOptions {
 
     public static final VisionOption<Double> MIN_ACCEPTED_SCORE = VisionOption.create("min_accepted_score", Double.class);
     public static final VisionOption<Boolean> MULTI_TARGET = VisionOption.create("multi_target", Boolean.class);
+
+    public static List<VisionOption<?>> allOptions() {
+        return Arrays.asList(
+                SELECTED_CAMERA,
+                HUE_MIN,
+                HUE_MAX,
+                SATURATION_MIN,
+                SATURATION_MAX,
+                VALUE_MIN,
+                VALUE_MAX,
+                MIN_ACCEPTED_SCORE,
+                MULTI_TARGET
+        );
+    }
 }
