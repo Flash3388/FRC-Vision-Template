@@ -30,7 +30,8 @@ public class KnownVisionOptions {
                 ExtraVisionOptions.SATURATION_MAX,
                 ExtraVisionOptions.SATURATION_MIN,
                 ExtraVisionOptions.VALUE_MAX,
-                ExtraVisionOptions.VALUE_MIN
+                ExtraVisionOptions.VALUE_MIN,
+                ExtraVisionOptions.MIN_ACCEPTED_SCORE
         );
     }
 }

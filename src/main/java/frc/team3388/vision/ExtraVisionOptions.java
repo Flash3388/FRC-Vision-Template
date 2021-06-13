@@ -14,4 +14,7 @@ public class ExtraVisionOptions {
     public static final VisionOption<Integer> SATURATION_MAX = VisionOption.create("saturation__max", Integer.class);
     public static final VisionOption<Integer> VALUE_MIN = VisionOption.create("value_min", Integer.class);
     public static final VisionOption<Integer> VALUE_MAX = VisionOption.create("value_max", Integer.class);
+
+    public static final VisionOption<Double> MIN_ACCEPTED_SCORE = VisionOption.create("min_accepted_score", Double.class);
+    public static final VisionOption<Boolean> MULTI_TARGET = VisionOption.create("multi_target", Boolean.class);
 }
