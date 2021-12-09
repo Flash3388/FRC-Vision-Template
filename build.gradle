@@ -43,6 +43,7 @@ dependencies {
     }
     implementation "com.flash3388.flashlib:flashlib.frc.nt:$FLASHFRC_VERSION"
 
+    ext.YEAR = WPILIB_VERSION.split('\\.')[0]
     implementation group: "edu.wpi.first.thirdparty.frc${YEAR}.opencv", name: 'opencv-java', version: "$OPENCV_VERSION"
     implementation group: "edu.wpi.first.thirdparty.frc${YEAR}.opencv", name: 'opencv-jni', version: "$OPENCV_VERSION", classifier: "$REMOTE_ARCH"
 
