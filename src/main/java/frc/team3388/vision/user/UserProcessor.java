@@ -59,8 +59,8 @@ public class UserProcessor implements Processor<VisionData, Optional<? extends S
                     mOutputPipeline.process(mOutputMat);
 
                     mLogger.debug("Found target {}", target);
-                    targetFound = true;
                 }
+                targetFound = true;
             }
         }
 

@@ -7,7 +7,6 @@ import frc.team3388.vision.ExtraVisionOptions;
 import frc.team3388.vision.VisionData;
 import frc.team3388.vision.config.ColorConfig;
 import frc.team3388.vision.config.Config;
-import frc.team3388.vision.control.VisionRunner;
 import frc.team3388.vision.user.HsvRange;
 
 import java.util.function.Consumer;
