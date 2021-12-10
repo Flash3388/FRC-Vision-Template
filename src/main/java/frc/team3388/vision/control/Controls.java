@@ -1,5 +1,7 @@
 package frc.team3388.vision.control;
 
+import frc.team3388.vision.nt.NtControl;
+
 public class Controls {
 
     private final NtControl mNtControl;

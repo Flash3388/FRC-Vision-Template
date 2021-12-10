@@ -1,10 +1,9 @@
-package frc.team3388.vision.control;
+package frc.team3388.vision.nt;
 
 import com.flash3388.frc.nt.vision.NtVisionServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.team3388.vision.config.Config;
-import frc.team3388.vision.config.NtMode;
 import org.slf4j.Logger;
 
 public class NtControl implements AutoCloseable {
@@ -14,7 +13,8 @@ public class NtControl implements AutoCloseable {
 
     public NtControl(Config config, Logger logger) {
         mInstance = NetworkTableInstance.getDefault();
-        startNetworkTables(config, logger);
+        NtStarter ntStarter = config.getNtConfig().getMode().createStarter();
+        ntStarter.start(mInstance, config.getNtConfig(), logger);
 
         mVisionServer = new NtVisionServer(mInstance.getTable("vision"));
     }
@@ -25,16 +25,6 @@ public class NtControl implements AutoCloseable {
 
     public NtVisionServer getVisionServer() {
         return mVisionServer;
-    }
-
-    private void startNetworkTables(Config config, Logger logger) {
-        if (config.getNtMode() == NtMode.SERVER) {
-            logger.info("Setting up NetworkTables server");
-            mInstance.startServer();
-        } else {
-            logger.info("Setting up NetworkTables client for team {}", config.getTeamNumber());
-            mInstance.startClientTeam(config.getTeamNumber());
-        }
     }
 
     @Override

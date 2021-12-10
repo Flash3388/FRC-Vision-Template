@@ -5,31 +5,25 @@ import java.util.List;
 
 public class Config {
 
-    private final int mTeam;
-    private final NtMode mNtMode;
     private final List<CameraConfig> mCameraConfigs;
+    private final NtConfig mNtConfig;
     private final VisionConfig mVisionConfig;
     private final TargetConfig mTargetConfig;
 
-    public Config(int team, NtMode ntMode, List<CameraConfig> cameraConfigs,
+    public Config(List<CameraConfig> cameraConfigs, NtConfig ntConfig,
                   VisionConfig visionConfig, TargetConfig targetConfig) {
-        mTeam = team;
-        mNtMode = ntMode;
         mCameraConfigs = Collections.unmodifiableList(cameraConfigs);
+        mNtConfig = ntConfig;
         mVisionConfig = visionConfig;
         mTargetConfig = targetConfig;
     }
 
-    public int getTeamNumber() {
-        return mTeam;
-    }
-
-    public NtMode getNtMode() {
-        return mNtMode;
-    }
-
     public List<CameraConfig> getCameraConfigs() {
         return mCameraConfigs;
+    }
+
+    public NtConfig getNtConfig() {
+        return mNtConfig;
     }
 
     public VisionConfig getVisionConfig() {

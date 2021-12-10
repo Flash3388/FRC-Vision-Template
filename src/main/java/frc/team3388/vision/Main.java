@@ -9,7 +9,7 @@ import frc.team3388.vision.config.ConfigLoader;
 import frc.team3388.vision.control.CameraControl;
 import frc.team3388.vision.control.CameraServerControl;
 import frc.team3388.vision.control.Controls;
-import frc.team3388.vision.control.NtControl;
+import frc.team3388.vision.nt.NtControl;
 import frc.team3388.vision.control.Vision;
 import frc.team3388.vision.control.VisionFactory;
 import net.sourceforge.argparse4j.ArgumentParsers;

@@ -10,8 +10,10 @@
             "fov": 0.43388
         }
     ],
-    "ntmode": "client",
-    "team": 3388,
+    "nt": {
+        "mode": "CLIENT_TEAM",
+        "team": 3388
+    },
     "target": {
         "realWidth": 92,
         "dimensionsRatio": 0.456521739

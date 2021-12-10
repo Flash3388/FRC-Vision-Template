@@ -8,7 +8,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import frc.team3388.vision.color.ColorSpace;
-import org.opencv.core.Range;
+import frc.team3388.vision.nt.NtMode;
 import org.opencv.core.Scalar;
 
 import java.io.BufferedReader;
@@ -52,45 +52,49 @@ public class ConfigLoader {
     }
 
     private Config parseRootObject(JsonObject rootObject) throws ConfigLoadException {
-        int teamNumber = parseTeamNumber(rootObject);
-        NtMode ntMode = parseNtMode(rootObject);
         List<CameraConfig> cameraConfigs = parseCameraConfigs(rootObject);
+        NtConfig ntConfig = parseNtConfig(rootObject);
         VisionConfig visionConfig = parseVisionConfig(rootObject);
         TargetConfig targetConfig = parseTargetConfig(rootObject);
 
-        return new Config(teamNumber, ntMode, cameraConfigs, visionConfig, targetConfig);
+        return new Config(cameraConfigs, ntConfig, visionConfig, targetConfig);
     }
 
-    private int parseTeamNumber(JsonObject rootObject) throws ConfigLoadException {
+    private NtConfig parseNtConfig(JsonObject rootObject) throws ConfigLoadException {
         try {
-            if (!rootObject.has("team")) {
-                throw new ConfigLoadException("missing `team` element");
+            if (!rootObject.has("nt")) {
+                throw new ConfigLoadException("missing `nt` element");
             }
 
-            return rootObject.get("team").getAsInt();
-        } catch (ClassCastException e) {
-            throw new ConfigLoadException("`team` element is not an int");
-        }
-    }
+            JsonObject nt = rootObject.get("nt").getAsJsonObject();
 
-    private NtMode parseNtMode(JsonObject rootObject) throws ConfigLoadException {
-        try {
-            if (!rootObject.has("ntmode")) {
-                return NtMode.UNDEFINED;
+            NtMode mode = NtMode.valueOf(nt.get("mode").getAsString());
+
+            int teamNumber = -1;
+            if (nt.has("team")) {
+                teamNumber = nt.get("team").getAsInt();
             }
 
-            String isServerStr = rootObject.get("ntmode").getAsString();
-
-            if (isServerStr.equals("server")) {
-                return NtMode.SERVER;
+            String[] addresses = null;
+            if (nt.has("addresses")) {
+                JsonArray jsonAddresses = nt.get("addresses").getAsJsonArray();
+                addresses = new String[jsonAddresses.size()];
+                for (int i = 0; i < jsonAddresses.size(); i++) {
+                    addresses[i] = jsonAddresses.get(i).getAsString();
+                }
             }
-            if (isServerStr.equals("client")) {
-                return NtMode.CLIENT;
+
+            int port = -1;
+            if (nt.has("port")) {
+                port = nt.get("port").getAsInt();
             }
 
-            throw new ConfigLoadException("`ntmode` contains invalid value: " + isServerStr);
-        } catch (ClassCastException e) {
-            throw new ConfigLoadException("`ntmode` element is not a string");
+            NtConfig config = new NtConfig(mode, teamNumber, addresses, port);
+            mode.verifyConfig(config);
+
+            return config;
+        } catch (ClassCastException | EnumConstantNotPresentException e) {
+            throw new ConfigLoadException("`nt` config is misconfigured");
         }
     }
 
