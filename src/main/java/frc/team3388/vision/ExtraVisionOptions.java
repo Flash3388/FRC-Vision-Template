@@ -8,10 +8,11 @@ public class ExtraVisionOptions {
 
     public static final VisionOption<Integer> SELECTED_CAMERA = VisionOption.create("selected_camera", Integer.class);
 
-    public static final VisionOption<Integer> HUE_MIN = VisionOption.create("hue_min", Integer.class);
-    public static final VisionOption<Integer> HUE_MAX = VisionOption.create("hue_max", Integer.class);
-    public static final VisionOption<Integer> SATURATION_MIN = VisionOption.create("saturation_min", Integer.class);
-    public static final VisionOption<Integer> SATURATION_MAX = VisionOption.create("saturation__max", Integer.class);
-    public static final VisionOption<Integer> VALUE_MIN = VisionOption.create("value_min", Integer.class);
-    public static final VisionOption<Integer> VALUE_MAX = VisionOption.create("value_max", Integer.class);
+    public static final VisionOption<Integer> COLOR_SPACE = VisionOption.create("color_space", Integer.class);
+    public static final VisionOption<Integer> COLOR_DIM1_MIN = VisionOption.create("color_dim1_min", Integer.class);
+    public static final VisionOption<Integer> COLOR_DIM1_MAX = VisionOption.create("color_dim1_max", Integer.class);
+    public static final VisionOption<Integer> COLOR_DIM2_MIN = VisionOption.create("color_dim2_min", Integer.class);
+    public static final VisionOption<Integer> COLOR_DIM2_MAX = VisionOption.create("color_dim2_max", Integer.class);
+    public static final VisionOption<Integer> COLOR_DIM3_MIN = VisionOption.create("color_dim3_min", Integer.class);
+    public static final VisionOption<Integer> COLOR_DIM3_MAX = VisionOption.create("color_dim3_max", Integer.class);
 }

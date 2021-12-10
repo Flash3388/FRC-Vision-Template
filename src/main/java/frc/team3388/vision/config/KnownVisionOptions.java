@@ -25,12 +25,12 @@ public class KnownVisionOptions {
                 StandardVisionOptions.DEBUG,
                 StandardVisionOptions.EXPOSURE,
                 ExtraVisionOptions.SELECTED_CAMERA,
-                ExtraVisionOptions.HUE_MAX,
-                ExtraVisionOptions.HUE_MIN,
-                ExtraVisionOptions.SATURATION_MAX,
-                ExtraVisionOptions.SATURATION_MIN,
-                ExtraVisionOptions.VALUE_MAX,
-                ExtraVisionOptions.VALUE_MIN
+                ExtraVisionOptions.COLOR_DIM1_MAX,
+                ExtraVisionOptions.COLOR_DIM1_MIN,
+                ExtraVisionOptions.COLOR_DIM2_MAX,
+                ExtraVisionOptions.COLOR_DIM2_MIN,
+                ExtraVisionOptions.COLOR_DIM3_MAX,
+                ExtraVisionOptions.COLOR_DIM3_MIN
         );
     }
 }

@@ -7,7 +7,7 @@ import frc.team3388.vision.ExtraVisionOptions;
 import frc.team3388.vision.VisionData;
 import frc.team3388.vision.config.ColorConfig;
 import frc.team3388.vision.config.Config;
-import frc.team3388.vision.user.HsvRange;
+import frc.team3388.vision.color.NtColorRange;
 
 import java.util.function.Consumer;
 
@@ -27,29 +27,29 @@ public class Vision {
         return mSource;
     }
 
-    public HsvRange configureColorSettings() {
+    public NtColorRange configureColorSettings() {
         ColorConfig colorConfig = mConfig.getVisionConfig().getColorConfig();
 
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.HUE_MIN)) {
-            mVisionServer.setOption(ExtraVisionOptions.HUE_MIN, colorConfig.getHue().start);
+        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM1_MIN)) {
+            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM1_MIN, colorConfig.getHue().start);
         }
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.HUE_MAX)) {
-            mVisionServer.setOption(ExtraVisionOptions.HUE_MAX, colorConfig.getHue().end);
+        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM1_MAX)) {
+            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM1_MAX, colorConfig.getHue().end);
         }
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.SATURATION_MIN)) {
-            mVisionServer.setOption(ExtraVisionOptions.SATURATION_MIN, colorConfig.getSaturation().start);
+        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM2_MIN)) {
+            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM2_MIN, colorConfig.getSaturation().start);
         }
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.SATURATION_MAX)) {
-            mVisionServer.setOption(ExtraVisionOptions.SATURATION_MAX, colorConfig.getSaturation().end);
+        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM2_MAX)) {
+            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM2_MAX, colorConfig.getSaturation().end);
         }
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.VALUE_MIN)) {
-            mVisionServer.setOption(ExtraVisionOptions.VALUE_MIN, colorConfig.getValue().start);
+        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM3_MIN)) {
+            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM3_MIN, colorConfig.getValue().start);
         }
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.VALUE_MAX)) {
-            mVisionServer.setOption(ExtraVisionOptions.VALUE_MAX, colorConfig.getValue().end);
+        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM3_MAX)) {
+            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM3_MAX, colorConfig.getValue().end);
         }
 
-        return new HsvRange(mVisionServer, colorConfig);
+        return new NtColorRange(mVisionServer);
     }
 
     public Consumer<Analysis> getAnalysisConsumer() {

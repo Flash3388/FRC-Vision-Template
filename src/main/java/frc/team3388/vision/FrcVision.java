@@ -12,7 +12,7 @@ import com.flash3388.flashlib.vision.processing.VisionPipeline;
 import frc.team3388.vision.config.Config;
 import frc.team3388.vision.control.VisionRunner;
 import frc.team3388.vision.user.ColorProcessor;
-import frc.team3388.vision.user.HsvRange;
+import frc.team3388.vision.color.NtColorRange;
 import frc.team3388.vision.control.Controls;
 import frc.team3388.vision.control.Vision;
 import frc.team3388.vision.user.UserAnalyser;
@@ -51,7 +51,7 @@ public class FrcVision {
 
     private VisionRunner startVisionThread() {
         Source<VisionData> source = mVision.getSource();
-        HsvRange colorSettings = mVision.configureColorSettings();
+        NtColorRange colorSettings = mVision.configureColorSettings();
         CvProcessing cvProcessing = new CvProcessing();
 
         Pipeline<Mat> postProcess = new FilterPipeline<>(
