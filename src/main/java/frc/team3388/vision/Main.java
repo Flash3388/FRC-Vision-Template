@@ -28,7 +28,7 @@ import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 public class Main {
 
-    private static final String DEFAULT_CONFIG_FILE_NAME = "frc.json";
+    private static final String DEFAULT_CONFIG_FILE_NAME = "config.json";
 
     public static void main(String[] args) throws ConfigLoadException, ArgumentParserException {
         ProgramOptions programOptions = handleArguments(args);

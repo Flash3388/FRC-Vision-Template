@@ -13,12 +13,10 @@ running and configuring vision code based on the `VisionControl` interface from 
 
 ## Configuration
 
-The configuration file allows editing different aspects of the code functionality. See [frc.json](frc.json) for example.
+The configuration file allows editing different aspects of the code functionality. See [config.json](config.json) for example.
 
 The configuration is made up of several parts in a hierarchy:
 - root: all the settings
-    - team: the team number
-    - ntmode: configuration of the network tables run mode
     - cameras: configurations for the connected cameras, should have information about all the cameras in a format matching
       the following template:
       ```JSON
@@ -43,6 +41,31 @@ The configuration is made up of several parts in a hierarchy:
           }
       ]
       ```
+    - nt: settings about network table connection. Different modes require
+        different settings.
+      ```json
+      "nt": {
+          "mode": "mode for connection with network tables",
+          "team": "team number" || optional
+          "addresses": [
+              "address of the server of network tables",
+              "another possibility of address"
+          ] || optional,
+          "port": "port of the server" || optional
+      }
+      ```
+        - mode "CLIENT_TEAM"
+            - connect as a client to the server
+            - uses roboRIO addresses expected for the team
+            - requires "team" setting
+        - mode "CLIENT_CUSTOM"
+            - connect as a client to the server
+            - uses configured addresses and port to connect to the server
+            - requires "addresses" setting
+            - requires "port" setting
+        - mode "SERVER"
+            - run as the server for network tables
+            - allows clients to connect
     - target: information about the target to find matching the following format:
       ```JSON
       "target": {
@@ -54,18 +77,13 @@ The configuration is made up of several parts in a hierarchy:
       ```JSON
       "vision": {
           "color": {
-              "hue": {
-                  "min": "initial min hue value (0->180)",
-                  "max": "initial max hue value (0->180)",
-              },
-              "saturation": {
-                  "min": "initial min saturation value (0->255)",
-                  "max": "initial max saturation value (0->255)",
-              },
-              "value": {
-                  "min": "initial min value value (0->255)",
-                  "max": "initial max value value (0->255)",
-              }
+              "space": "color space to work with",
+              "min": [
+                  "minimum values to filter in the image for each color dimension"
+              ],
+              "max": [
+                  "maximum values to filter in the image for each color dimension"
+              ]    
           },
           "type": "type of vision control, which determine how to use the cameras. Based on VisionType enum",
           "camera": "only for SINGLE_CAMERA type - specifies index of camera to use from among the camera configs"
@@ -78,6 +96,7 @@ The configuration is made up of several parts in a hierarchy:
         - `VisionType` indicates how the vision should reflect when having several cameras.
             - `SINGLE_CAMERA`: vision code will only run on one camera while the rest will simply be used for looking.
             - `SWITCHED_CAMERA`: vision code will use the currently selected camera. Switching cameras will affect vision as well.
+        - color space: one of `RGB`, `HSV`, `BGR` 
       
 ## Vision Options
 
@@ -88,12 +107,14 @@ The supported `VisionOption` types are:
 In addition, there are custom vision options:
 - `ExtraVisionOptions.SELECTED_CAMERA`: index for which camera to show. depending on the `VisionType` used this 
   might affect vision or simply affect what is shown by the MJpeg server
-- `ExtraVisionOptions.HUE_MIN`: min hue value for the color filtering
-- `ExtraVisionOptions.HUE_MAX`: max hue value for the color filtering
-- `ExtraVisionOptions.SATURATION_MIN`: min saturation value for the color filtering
-- `ExtraVisionOptions.SATURATION_MAX`: max saturation value for the color filtering
-- `ExtraVisionOptions.VALUE_MIN`: min value value for the color filtering
-- `ExtraVisionOptions.VALUE_MAX`: max value value for the color filtering
+- `ExtraVisionOptions.COLOR_SPACE`: color space used in the color filtering. The `MIN`/`MAX` options
+  available for use depend on the amount of dimensions in the space.
+- `ExtraVisionOptions.COLOR_DIM1_MIN`: min value for the first dimension in the color filtering
+- `ExtraVisionOptions.COLOR_DIM1_MAX`: max value for the first dimension in the color filtering
+- `ExtraVisionOptions.COLOR_DIM2_MIN`: min value for the second dimension in the color filtering
+- `ExtraVisionOptions.COLOR_DIM2_MAX`: max value for the second dimension in the color filtering
+- `ExtraVisionOptions.COLOR_DIM3_MIN`: min value for the third dimension in the color filtering
+- `ExtraVisionOptions.COLOR_DIM3_MAX`: max value for the third dimension in the color filtering
 
 ## Robot Interaction
 
@@ -115,7 +136,7 @@ See [this example](https://github.com/Flash3388/FlashFRC/tree/development/exampl
 Building and deploying is based on _gradle_ tasks. Run the wrapper (`./gradlew` on UNIX and `gradlew.bat` on Windows)
 with the tasks `build` to build and `deploy` to deploy.
 
-Deploying will push the compiled code and the [configuration file](frc.json) to a place specified by gradle configuration, as seen
+Deploying will push the compiled code and the [configuration file](config.json) to a place specified by gradle configuration, as seen
 in [gradle.properties](gradle.properties):
 - `DEPLOY_PATH`: absolute path on the remote to deploy the code. Should exist. Will be the parent folder of the code.
 - `DEPLOY_HOST`: hostname of the remote device to deploy to.
@@ -135,7 +156,7 @@ extracted to `DEPLOY_PATH/frcvision`.
 To run the deployed code, run the `DEPLOY_PATH/frcvision/bin/frcvision` file.
 Or, run the _gradle_ task `runRemote`.
 
-For security reasons, the password to connect to the deploy target is not saved in gradle.properties and needs to be
+For security reasons, the password to connect to the deployment target is not saved in gradle.properties and needs to be
 specified manually when deploying:
 ```shell script
 ./gradlew runRemote -PtargetPassword=somepassword
@@ -146,7 +167,10 @@ of the code running, and then start the new one.
 
 The gradle task will output information from the standard output
 of the remote process. Killing the gradle task (with CTRL+C for example)
-will not kill the remote process.
+will not kill the remote process. Run the task
+```shell
+./gradlew killRemote
+```
 
 #### Debug
 
@@ -154,3 +178,28 @@ For additional debug information, use `-PrunDebug=1`. This will
 run the program with the options:
 - `--log-level=DEBUG`
 - `--console-log`
+
+#### Run with Simulator
+
+For testing, it is possible to run the code locally alongside a simulation of the robot.
+The program will connect to locally-connected cameras following the configuration set for it.
+
+In order for the code to be connected to network-tables to communicate with the robot,
+the "nt" configuration should be set to connect to a locally running server:
+
+```json
+{
+  "nt": {
+    "mode": "CLIENT_CUSTOM",
+    "addresses": [
+      "127.0.0.1"
+    ],
+    "port": 1735
+  }
+}
+```
+
+To run locally, executed:
+```shell
+./gradlew run
+```

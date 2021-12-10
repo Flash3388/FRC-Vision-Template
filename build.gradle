@@ -86,7 +86,7 @@ application {
 }
 
 run {
-    args "--config-file=${project.file('frc.json').absolutePath}",
+    args "--config-file=${project.file('config.json').absolutePath}",
             "--console-log",
             "--log-level=DEBUG"
 }
@@ -106,7 +106,7 @@ task deploy {
                 execute "unzip ${DEPLOY_PATH}/${distributionName} -d ${DEPLOY_PATH}"
 
                 // upload configuration
-                put from: rootProject.file('frc.json').absolutePath, into: "${DEPLOY_PATH}"
+                put from: rootProject.file('config.json').absolutePath, into: "${DEPLOY_PATH}"
             }
         }
     }
@@ -129,7 +129,7 @@ task runRemote {
                 // run the last deployed
                 def runCommand =
                         "${DEPLOY_PATH}/${application.applicationName}/bin/${application.applicationName} " +
-                        "--config-file=${DEPLOY_PATH}/frc.json"
+                        "--config-file=${DEPLOY_PATH}/config.json"
                 if (project.hasProperty("runDebug")) {
                     runCommand += " --log-level=DEBUG --console-log"
                 }
