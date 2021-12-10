@@ -10,11 +10,19 @@ public class TargetConfig {
         mJsonData = jsonData;
     }
 
+    public double getDoubleProperty(String name) {
+        return mJsonData.get(name).getAsDouble();
+    }
+
+    public double getIntProperty(String name) {
+        return mJsonData.get(name).getAsInt();
+    }
+
     public double getRealWidth() {
-        return mJsonData.get("realWidth").getAsDouble();
+        return getDoubleProperty("realWidth");
     }
 
     public double getDimensionsRatio() {
-        return mJsonData.get("dimensionsRatio").getAsDouble();
+        return getDoubleProperty("dimensionsRatio");
     }
 }
