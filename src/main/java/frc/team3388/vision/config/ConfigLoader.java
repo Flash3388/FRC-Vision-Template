@@ -7,7 +7,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import frc.team3388.vision.color.ColorSpace;
 import org.opencv.core.Range;
+import org.opencv.core.Scalar;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -174,30 +176,34 @@ public class ConfigLoader {
         }
 
         JsonObject root = rootObject.getAsJsonObject("color");
-        Range hue = parseRange(root, "hue");
-        Range saturation = parseRange(root, "saturation");
-        Range value = parseRange(root, "value");
 
-        return new ColorConfig(hue, saturation, value);
+        ColorSpace colorSpace = ColorSpace.HSV;
+        if (root.has("space")) {
+            colorSpace = ColorSpace.valueOf(root.get("space").getAsString());
+        }
+
+        Scalar min = parseScalar(root, "min");
+        Scalar max = parseScalar(root, "max");
+
+        return new ColorConfig(colorSpace, min, max);
     }
 
-    private Range parseRange(JsonObject rootObject, String memberName) throws ConfigLoadException {
+    private Scalar parseScalar(JsonObject rootObject, String memberName) throws ConfigLoadException {
         try {
             if (!rootObject.has(memberName)) {
                 throw new ConfigLoadException("Missing " + memberName);
             }
 
-            JsonObject range = rootObject.getAsJsonObject(memberName);
-            if (!range.has("min") || !range.has("max")) {
-                throw new ConfigLoadException("Range missing min/max: " + memberName);
+            JsonArray scalar = rootObject.getAsJsonArray(memberName);
+
+            double[] values = {0, 0, 0, 0};
+            for (int i = 0; i < scalar.size(); i++) {
+                values[i] = scalar.get(i).getAsInt();
             }
 
-            return new Range(
-                    range.get("min").getAsInt(),
-                    range.get("max").getAsInt()
-            );
+            return new Scalar(values);
         } catch (ClassCastException e) {
-            throw new ConfigLoadException("Range type error, should be object with min/max integers: " + memberName);
+            throw new ConfigLoadException("Scalar type error, should be object with min/max integers: " + memberName);
         }
     }
 

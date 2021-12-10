@@ -1,28 +1,29 @@
 package frc.team3388.vision.config;
 
-import org.opencv.core.Range;
+import frc.team3388.vision.color.ColorSpace;
+import org.opencv.core.Scalar;
 
 public class ColorConfig {
 
-    private final Range mHue;
-    private final Range mSaturation;
-    private final Range mValue;
+    private final ColorSpace mColorSpace;
+    private final Scalar mMin;
+    private final Scalar mMax;
 
-    public ColorConfig(Range hue, Range saturation, Range value) {
-        mHue = hue;
-        mSaturation = saturation;
-        mValue = value;
+    public ColorConfig(ColorSpace colorSpace, Scalar min, Scalar max) {
+        mColorSpace = colorSpace;
+        mMin = min;
+        mMax = max;
     }
 
-    public Range getHue() {
-        return mHue;
+    public ColorSpace getColorSpace() {
+        return mColorSpace;
     }
 
-    public Range getSaturation() {
-        return mSaturation;
+    public Scalar getMin() {
+        return mMin;
     }
 
-    public Range getValue() {
-        return mValue;
+    public Scalar getMax() {
+        return mMax;
     }
 }

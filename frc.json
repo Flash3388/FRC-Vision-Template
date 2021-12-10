@@ -18,18 +18,17 @@
     },
     "vision": {
         "color": {
-            "hue": {
-                "min": 100,
-                "max": 180
-            },
-            "saturation": {
-                "min": 200,
-                "max": 255
-            },
-            "value": {
-                "min": 200,
-                "max": 255
-            }
+            "space": "HSV",
+            "min": [
+              0,
+              0,
+              0
+            ],
+            "max": [
+              180,
+              255,
+              255
+            ]
         },
         "type": "SINGLE_CAMERA",
         "camera": 0,

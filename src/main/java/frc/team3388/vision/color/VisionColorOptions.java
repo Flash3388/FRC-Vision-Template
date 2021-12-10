@@ -3,6 +3,7 @@ package frc.team3388.vision.color;
 import com.flash3388.flashlib.vision.control.VisionOption;
 import com.flash3388.frc.nt.vision.NtVisionServer;
 import frc.team3388.vision.ExtraVisionOptions;
+import frc.team3388.vision.config.ColorConfig;
 import org.opencv.core.Scalar;
 
 import java.util.Arrays;
@@ -13,13 +14,25 @@ public class VisionColorOptions {
     private final NtVisionServer mServer;
     private final List<ColorDimensionOptions> mDimensions;
 
-    public VisionColorOptions(NtVisionServer server) {
+    public VisionColorOptions(NtVisionServer server, ColorConfig colorConfig) {
         mServer = server;
         mDimensions = Arrays.asList(
                 new ColorDimensionOptions(ExtraVisionOptions.COLOR_DIM1_MIN, ExtraVisionOptions.COLOR_DIM1_MAX),
                 new ColorDimensionOptions(ExtraVisionOptions.COLOR_DIM2_MIN, ExtraVisionOptions.COLOR_DIM2_MAX),
                 new ColorDimensionOptions(ExtraVisionOptions.COLOR_DIM3_MIN, ExtraVisionOptions.COLOR_DIM3_MAX)
         );
+
+        if (!server.hasOptionValue(ExtraVisionOptions.COLOR_SPACE)) {
+            server.setOption(ExtraVisionOptions.COLOR_SPACE, colorConfig.getColorSpace().ordinal());
+        }
+
+        for (int i = 0; i < mDimensions.size(); i++) {
+            mDimensions.get(i).set(
+                    server,
+                    (int) colorConfig.getMin().val[i],
+                    (int) colorConfig.getMax().val[i]
+            );
+        }
     }
 
     public ColorSpace getColorSpace() {
@@ -65,6 +78,16 @@ public class VisionColorOptions {
 
         public int getMax(NtVisionServer server, ColorDimension dimension) {
             return server.getOptionOrDefault(mMax, dimension.getValueRange().end);
+        }
+
+        public void set(NtVisionServer server, int min, int max) {
+            if (!server.hasOptionValue(mMin)) {
+                server.setOption(mMin, min);
+            }
+
+            if (!server.hasOptionValue(mMax)) {
+                server.setOption(mMax, max);
+            }
         }
     }
 }

@@ -29,27 +29,7 @@ public class Vision {
 
     public NtColorRange configureColorSettings() {
         ColorConfig colorConfig = mConfig.getVisionConfig().getColorConfig();
-
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM1_MIN)) {
-            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM1_MIN, colorConfig.getHue().start);
-        }
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM1_MAX)) {
-            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM1_MAX, colorConfig.getHue().end);
-        }
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM2_MIN)) {
-            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM2_MIN, colorConfig.getSaturation().start);
-        }
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM2_MAX)) {
-            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM2_MAX, colorConfig.getSaturation().end);
-        }
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM3_MIN)) {
-            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM3_MIN, colorConfig.getValue().start);
-        }
-        if (!mVisionServer.hasOptionValue(ExtraVisionOptions.COLOR_DIM3_MAX)) {
-            mVisionServer.setOption(ExtraVisionOptions.COLOR_DIM3_MAX, colorConfig.getValue().end);
-        }
-
-        return new NtColorRange(mVisionServer);
+        return new NtColorRange(mVisionServer, colorConfig);
     }
 
     public Consumer<Analysis> getAnalysisConsumer() {

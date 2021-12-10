@@ -1,6 +1,7 @@
 package frc.team3388.vision.color;
 
 import com.flash3388.frc.nt.vision.NtVisionServer;
+import frc.team3388.vision.config.ColorConfig;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
@@ -9,8 +10,8 @@ public class NtColorRange {
 
     private final VisionColorOptions mColorOptions;
 
-    public NtColorRange(NtVisionServer visionServer) {
-        mColorOptions = new VisionColorOptions(visionServer);
+    public NtColorRange(NtVisionServer visionServer, ColorConfig colorConfig) {
+        mColorOptions = new VisionColorOptions(visionServer, colorConfig);
     }
 
     public void convertColorSpace(Mat src, ColorSpace srcColorSpace, Mat dst) {
