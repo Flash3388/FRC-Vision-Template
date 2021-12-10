@@ -199,6 +199,11 @@ the "nt" configuration should be set to connect to a locally running server:
 }
 ```
 
+In addition, network-tables has some native code. The code version must match the platform
+on which it runs. The value is configured in [gradle properties file](gradle.properties) under the key `REMOTE_ARCH`. 
+It needs to be modified to the local computer arch in order to run. 
+The value should be `{osName}{arch}`, for example `linuxx86-64` for a computer running _linux_ with a _x86-64_ CPU.
+
 To run locally, executed:
 ```shell
 ./gradlew run
