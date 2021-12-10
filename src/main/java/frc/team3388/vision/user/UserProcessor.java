@@ -48,6 +48,9 @@ public class UserProcessor implements Processor<VisionData, Optional<? extends S
         boolean isDebugMode = input.getOptionOrDefault(StandardVisionOptions.DEBUG, false);
         boolean targetFound = false;
 
+        // Additional ideas
+        // https://docs.wpilib.org/en/stable/docs/software/vision-processing/wpilibpi/morphological-operations.html
+
         List<MatOfPoint> contours = mCvProcessing.detectContours(image);
         Optional<RatioTarget> optional = retrieveBestTarget(contours);
         if (optional.isPresent()) {
