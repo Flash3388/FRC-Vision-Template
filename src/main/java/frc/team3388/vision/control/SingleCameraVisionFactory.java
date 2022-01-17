@@ -2,7 +2,7 @@ package frc.team3388.vision.control;
 
 import com.flash3388.frc.nt.vision.NtVisionServer;
 import com.flash3388.frc.nt.vision.StandardVisionOptions;
-import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.cscore.VideoSource;
 import frc.team3388.vision.config.CameraConfig;
 import frc.team3388.vision.config.Config;
 import frc.team3388.vision.config.VisionConfig;
