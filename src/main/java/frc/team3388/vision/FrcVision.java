@@ -2,6 +2,7 @@ package frc.team3388.vision;
 
 import com.castle.util.throwables.ThrowableHandler;
 import com.flash3388.flashlib.time.Time;
+import com.flash3388.flashlib.util.logging.Logging;
 import com.flash3388.flashlib.vision.FilterPipeline;
 import com.flash3388.flashlib.vision.Pipeline;
 import com.flash3388.flashlib.vision.Source;
@@ -84,6 +85,7 @@ public class FrcVision {
     private void waitForever() {
         CountDownLatch latch = new CountDownLatch(1);
         Runtime.getRuntime().addShutdownHook(new LoopReleaseThread(latch));
+
 
         mLogger.debug("Entering wait loop");
         for (;;) {

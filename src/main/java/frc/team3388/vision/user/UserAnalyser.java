@@ -1,5 +1,6 @@
 package frc.team3388.vision.user;
 
+import com.flash3388.flashlib.util.logging.Logging;
 import com.flash3388.flashlib.vision.VisionException;
 import com.flash3388.flashlib.vision.cv.processing.Scorable;
 import com.flash3388.flashlib.vision.processing.analysis.Analyser;
@@ -9,15 +10,19 @@ import frc.team3388.vision.VisionData;
 import frc.team3388.vision.config.CameraConfig;
 import frc.team3388.vision.config.TargetConfig;
 import org.opencv.core.Mat;
+import org.slf4j.Logger;
 
 import java.util.Optional;
 
 public class UserAnalyser implements Analyser<VisionData, Optional<? extends Scorable>> {
 
     private final TargetConfig mTargetConfig;
+    private final Logger mLogger;
+
 
     public UserAnalyser(TargetConfig targetConfig) {
         mTargetConfig = targetConfig;
+        mLogger = Logging.consoleLogger("xxx");
     }
 
     @Override
@@ -36,6 +41,7 @@ public class UserAnalyser implements Analyser<VisionData, Optional<? extends Sco
                 target.getWidth(),
                 mTargetConfig.getRealWidth(),
                 cameraConfig.getCameraFieldOfViewRadians());
+
 
         double angle = AnalysisAlgorithms.calculateHorizontalOffsetDegrees2(
                 target.getCenter().x(),
