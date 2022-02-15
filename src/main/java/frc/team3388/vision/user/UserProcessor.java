@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+
 public class UserProcessor implements Processor<VisionData, Optional<? extends Scorable>> {
 
     private static final double MIN_CONTOUR_SIZE = 1000;

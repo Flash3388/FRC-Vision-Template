@@ -20,6 +20,7 @@ public class ColorProcessor implements Processor<VisionData, VisionData> {
 
     @Override
     public VisionData process(VisionData input) {
+        // hue: dim_?, saturation: dim_? value: dim_?
         mColorRange.convertColorSpace(input.getImage(), ColorSpace.BGR, input.getImage());
         mColorRange.filterColors(input.getImage(), input.getImage());
 
