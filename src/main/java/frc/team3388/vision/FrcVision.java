@@ -2,16 +2,15 @@ package frc.team3388.vision;
 
 import com.castle.util.throwables.ThrowableHandler;
 import com.flash3388.flashlib.time.Time;
-import com.flash3388.flashlib.util.logging.Logging;
 import com.flash3388.flashlib.vision.FilterPipeline;
 import com.flash3388.flashlib.vision.Pipeline;
 import com.flash3388.flashlib.vision.Source;
 import com.flash3388.flashlib.vision.cv.CvProcessing;
-import com.flash3388.flashlib.vision.cv.processing.Scorable;
 import com.flash3388.flashlib.vision.processing.Processor;
 import com.flash3388.flashlib.vision.processing.VisionPipeline;
 import frc.team3388.vision.config.Config;
 import frc.team3388.vision.control.VisionRunner;
+import frc.team3388.vision.detect.ScorableTarget;
 import frc.team3388.vision.user.ColorProcessor;
 import frc.team3388.vision.color.NtColorRange;
 import frc.team3388.vision.control.Controls;
@@ -21,6 +20,8 @@ import frc.team3388.vision.user.UserProcessor;
 import org.opencv.core.Mat;
 import org.slf4j.Logger;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -59,11 +60,11 @@ public class FrcVision {
                 (mat)-> !mat.empty(),
                 mControls.getServerControl()::putPostProcess);
 
-        Processor<VisionData, Optional<? extends Scorable>> processor = new ColorProcessor(colorSettings, cvProcessing)
+        Processor<VisionData, Optional<? extends Map<Integer, ? extends ScorableTarget>>> processor = new ColorProcessor(colorSettings, cvProcessing)
                 .andThen(new UserProcessor(cvProcessing, mConfig.getTargetConfig(),
                         postProcess, mLogger));
 
-        Pipeline<VisionData> imagePipeline = new VisionPipeline.Builder<VisionData, Optional<? extends Scorable>>()
+        Pipeline<VisionData> imagePipeline = new VisionPipeline.Builder<VisionData, Optional<? extends Map<Integer, ? extends ScorableTarget>>>()
                 .process(processor)
                 .analyse(new UserAnalyser(mConfig.getTargetConfig()))
                 .analysisTo(mVision.getAnalysisConsumer())

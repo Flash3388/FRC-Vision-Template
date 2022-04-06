@@ -1,56 +1,63 @@
 package frc.team3388.vision.user;
 
-import com.flash3388.flashlib.util.logging.Logging;
 import com.flash3388.flashlib.vision.VisionException;
+import com.flash3388.flashlib.vision.analysis.Analyser;
+import com.flash3388.flashlib.vision.analysis.Analysis;
+import com.flash3388.flashlib.vision.analysis.AnalysisAlgorithms;
+import com.flash3388.flashlib.vision.analysis.JsonAnalysis;
 import com.flash3388.flashlib.vision.cv.processing.Scorable;
-import com.flash3388.flashlib.vision.processing.analysis.Analyser;
-import com.flash3388.flashlib.vision.processing.analysis.Analysis;
-import com.flash3388.flashlib.vision.processing.analysis.AnalysisAlgorithms;
 import frc.team3388.vision.VisionData;
 import frc.team3388.vision.config.CameraConfig;
 import frc.team3388.vision.config.TargetConfig;
+import frc.team3388.vision.detect.ScorableTarget;
 import org.opencv.core.Mat;
-import org.slf4j.Logger;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
-public class UserAnalyser implements Analyser<VisionData, Optional<? extends Scorable>> {
+public class UserAnalyser implements Analyser<VisionData, Optional<? extends Map<Integer, ? extends ScorableTarget>>> {
 
     private final TargetConfig mTargetConfig;
-    private final Logger mLogger;
-
 
     public UserAnalyser(TargetConfig targetConfig) {
         mTargetConfig = targetConfig;
-        mLogger = Logging.consoleLogger("xxx");
     }
 
     @Override
     public Optional<Analysis> analyse(VisionData originalInput,
-                                      Optional<? extends Scorable> postProcess) throws VisionException {
+                                      Optional<? extends Map<Integer, ? extends ScorableTarget>> postProcess)
+            throws VisionException {
         if (postProcess.isEmpty()) {
             return Optional.empty();
         }
 
         Mat originalImage = originalInput.getImage();
         CameraConfig cameraConfig = originalInput.getCameraConfig();
-        Scorable target = postProcess.get();
+        Map<Integer, ? extends ScorableTarget> targets = postProcess.get();
 
-        double distance = AnalysisAlgorithms.measureDistance(
-                originalImage.width(),
-                target.getWidth(),
-                mTargetConfig.getRealWidth(),
-                cameraConfig.getCameraFieldOfViewRadians());
+        JsonAnalysis.Builder builder = new JsonAnalysis.Builder();
 
+        for (Map.Entry<Integer, ? extends ScorableTarget> entry : targets.entrySet()) {
+            ScorableTarget target = entry.getValue();
 
-        double angle = AnalysisAlgorithms.calculateHorizontalOffsetDegrees2(
-                target.getCenter().x(),
-                originalImage.width(),
-                cameraConfig.getCameraFieldOfViewRadians());
+            double distance = AnalysisAlgorithms.measureDistance(
+                    originalImage.width(),
+                    target.getWidth(),
+                    mTargetConfig.getRealWidth(),
+                    cameraConfig.getCameraFieldOfViewRadians());
+            double angle = AnalysisAlgorithms.calculateHorizontalOffsetDegrees2(
+                    target.getCenter().x(),
+                    originalImage.width(),
+                    cameraConfig.getCameraFieldOfViewRadians());
 
-        return Optional.of(new Analysis.Builder()
-                .put("distance", distance)
-                .put("angle", angle)
-                .build());
+            builder.buildTarget()
+                    .put("id", entry.getKey())
+                    .put("distance", distance)
+                    .put("angle", angle)
+                    .build();
+        }
+
+        return Optional.of(builder.build());
     }
 }

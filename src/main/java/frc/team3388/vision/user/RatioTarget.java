@@ -1,13 +1,13 @@
 package frc.team3388.vision.user;
 
-import com.flash3388.flashlib.vision.cv.processing.Scorable;
 import com.jmath.vectors.Vector2;
+import frc.team3388.vision.detect.ScorableTarget;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-public class RatioTarget implements Scorable {
+public class RatioTarget implements ScorableTarget {
 
     private final Rect mRect;
     private final double mExpectedDimensionRatio;
@@ -43,6 +43,7 @@ public class RatioTarget implements Scorable {
                 ratio / mExpectedDimensionRatio;
     }
 
+    @Override
     public void drawOn(Mat mat) {
         Imgproc.rectangle(mat, mRect.tl(), mRect.br(), new Scalar(78, 150, 200), 2);
     }

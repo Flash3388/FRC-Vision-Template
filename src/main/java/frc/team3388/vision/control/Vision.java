@@ -1,13 +1,12 @@
 package frc.team3388.vision.control;
 
 import com.flash3388.flashlib.vision.Source;
-import com.flash3388.flashlib.vision.processing.analysis.Analysis;
+import com.flash3388.flashlib.vision.analysis.Analysis;
 import com.flash3388.frc.nt.vision.NtVisionServer;
-import frc.team3388.vision.ExtraVisionOptions;
 import frc.team3388.vision.VisionData;
+import frc.team3388.vision.color.NtColorRange;
 import frc.team3388.vision.config.ColorConfig;
 import frc.team3388.vision.config.Config;
-import frc.team3388.vision.color.NtColorRange;
 
 import java.util.function.Consumer;
 
