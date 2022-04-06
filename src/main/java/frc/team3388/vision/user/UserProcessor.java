@@ -11,6 +11,8 @@ import frc.team3388.vision.detect.ObjectDetector;
 import frc.team3388.vision.detect.ObjectTracker;
 import frc.team3388.vision.detect.ScorableTarget;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
 
@@ -63,9 +65,14 @@ public class UserProcessor implements Processor<VisionData, Optional<? extends M
         } else if (isDebugMode) {
             Imgproc.cvtColor(image, mOutputMat, Imgproc.COLOR_GRAY2RGB);
 
-            for (ScorableTarget target : targets.values()) {
+            for (Map.Entry<Integer, ? extends ScorableTarget> entry : targets.entrySet()) {
+                ScorableTarget target = entry.getValue();
+                Point center = new Point(target.getCenter().x(), target.getCenter().y());
+
                 target.drawOn(mOutputMat);
-                mLogger.debug("Found target {}", target);
+                Imgproc.putText(mOutputMat, String.valueOf(entry.getKey()), center,
+                        Imgproc.FONT_HERSHEY_PLAIN, 1, new Scalar(23, 35, 100));
+                mLogger.debug("Found target (id={}) {}", entry.getKey(), target);
             }
 
             mOutputPipeline.process(mOutputMat);
