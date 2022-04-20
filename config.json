@@ -16,7 +16,9 @@
     },
     "target": {
         "realWidth": 92,
-        "dimensionsRatio": 0.456521739
+        "dimensionsRatio": 0.456521739,
+        "minSize": 1000,
+        "minScore": 0.7
     },
     "vision": {
         "color": {
