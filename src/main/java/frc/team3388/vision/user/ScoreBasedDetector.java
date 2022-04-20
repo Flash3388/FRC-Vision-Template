@@ -17,9 +17,6 @@ import java.util.stream.Stream;
 
 public class ScoreBasedDetector implements ObjectDetector {
 
-    private static final double MIN_CONTOUR_SIZE = 1000;
-    private static final double MIN_SCORE = 0.6;
-
     private final CvProcessing mCvProcessing;
     private final TargetConfig mTargetConfig;
 
@@ -42,9 +39,9 @@ public class ScoreBasedDetector implements ObjectDetector {
 
     private Collection<RatioTarget> retrieveTargets(List<MatOfPoint> contours) {
         return rectifyContours(contours)
-                .filter(rect -> rect.area() > MIN_CONTOUR_SIZE)
+                .filter(rect -> rect.area() >= mTargetConfig.getMinSize())
                 .map(rect -> new RatioTarget(rect, mTargetConfig.getDimensionsRatio()))
-                .filter(target -> target.score() >= MIN_SCORE)
+                .filter(target -> target.score() >= mTargetConfig.getMinScore())
                 .collect(Collectors.toList());
     }
 

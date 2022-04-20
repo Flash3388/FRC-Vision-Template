@@ -37,6 +37,10 @@ public class CenteroidTracker implements ObjectTracker {
                 trackPairs.add(new TrackPair(entry.getValue(), i, targetsList.get(i)));
             }
 
+            if (trackPairs.isEmpty()) {
+                continue;
+            }
+
             // we want the smallest distance match, which will be the first after sorting
             trackPairs.sort(Comparator.comparingDouble(TrackPair::distance));
             TrackPair pair = trackPairs.get(0);

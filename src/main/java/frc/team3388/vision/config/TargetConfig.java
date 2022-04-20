@@ -14,7 +14,7 @@ public class TargetConfig {
         return mJsonData.get(name).getAsDouble();
     }
 
-    public double getIntProperty(String name) {
+    public int getIntProperty(String name) {
         return mJsonData.get(name).getAsInt();
     }
 
@@ -24,5 +24,13 @@ public class TargetConfig {
 
     public double getDimensionsRatio() {
         return getDoubleProperty("dimensionsRatio");
+    }
+
+    public int getMinSize() {
+        return getIntProperty("minSize");
+    }
+
+    public double getMinScore() {
+        return getDoubleProperty("minScore");
     }
 }
