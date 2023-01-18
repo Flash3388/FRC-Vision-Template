@@ -1,5 +1,6 @@
 package frc.team3388.vision.config;
 
+import com.castle.reflect.NumberAdapter;
 import com.castle.reflect.Types;
 import com.flash3388.flashlib.vision.control.VisionOption;
 import com.google.gson.JsonArray;
@@ -25,10 +26,12 @@ public class ConfigLoader {
 
     private final File mConfigFile;
     private final KnownVisionOptions mKnownVisionOptions;
+    private NumberAdapter mNumberAdapter;
 
     public ConfigLoader(File configFile) {
         mConfigFile = configFile;
         mKnownVisionOptions = new KnownVisionOptions();
+        mNumberAdapter = new NumberAdapter();
     }
 
     public Config load() throws ConfigLoadException {
@@ -248,8 +251,8 @@ public class ConfigLoader {
     private Object parseByType(JsonPrimitive element, Class<?> type) throws ConfigLoadException {
         if (element.isBoolean() && type.equals(Boolean.class)) {
             return element.getAsBoolean();
-        } else if (element.isNumber() && type.getSuperclass().equals(Number.class)) {
-            return Types.smartCast(element.getAsNumber(), type);
+        } else if (element.isNumber() && type.getSuperclass().equals(Number.class) && mNumberAdapter.canAdapt(type)) {
+            return mNumberAdapter.adapt(element.getAsNumber(), type);
         } else if (element.isString() && type.equals(String.class)) {
             return element.getAsString();
         }
