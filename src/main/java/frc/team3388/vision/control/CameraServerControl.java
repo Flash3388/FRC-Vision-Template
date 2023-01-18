@@ -14,9 +14,8 @@ public class CameraServerControl implements AutoCloseable {
     private final CvSource mPostProcess;
 
     public CameraServerControl(Logger logger) {
-        CameraServer cameraServer = CameraServer.getInstance();
-        mMainCamera = cameraServer.addSwitchedCamera("camera");
-        mPostProcess = cameraServer.putVideo("post-process", 320, 480);
+        mMainCamera = CameraServer.addSwitchedCamera("camera");
+        mPostProcess = CameraServer.putVideo("post-process", 320, 480);
 
         logger.info("Main camera server opened on \"{}\"", mMainCamera.getName());
         logger.info("Post process server opened on \"{}\"", mPostProcess.getName());
