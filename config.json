@@ -1,13 +1,13 @@
 {
     "cameras": [
         {
-            "fps": 30,
-            "height": 480,
             "name": "rPi Camera 0",
             "path": "/dev/video0",
-            "pixel format": "mjpeg",
+            "fps": 30,
             "width": 320,
-            "fov": 1.229061
+            "height": 480,
+            "fov": 1.229061,
+            "pixel format": "mjpeg"
         }
     ],
     "nt": {

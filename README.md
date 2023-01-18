@@ -46,6 +46,7 @@ The configuration is made up of several parts in a hierarchy:
       ```json
       "nt": {
           "mode": "mode for connection with network tables",
+          "identity": "network identity to advertise client", || optional
           "team": "team number" || optional
           "addresses": [
               "address of the server of network tables",

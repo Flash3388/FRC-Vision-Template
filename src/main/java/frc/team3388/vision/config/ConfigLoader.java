@@ -78,6 +78,11 @@ public class ConfigLoader {
                 teamNumber = nt.get("team").getAsInt();
             }
 
+            String identity = "Camera_Client";
+            if (nt.has("identity")) {
+                identity = nt.get("identity").getAsString();
+            }
+
             String[] addresses = null;
             if (nt.has("addresses")) {
                 JsonArray jsonAddresses = nt.get("addresses").getAsJsonArray();
@@ -92,7 +97,7 @@ public class ConfigLoader {
                 port = nt.get("port").getAsInt();
             }
 
-            NtConfig config = new NtConfig(mode, teamNumber, addresses, port);
+            NtConfig config = new NtConfig(mode, identity, teamNumber, addresses, port);
             mode.verifyConfig(config);
 
             return config;

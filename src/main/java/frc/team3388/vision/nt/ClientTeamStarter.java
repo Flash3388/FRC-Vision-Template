@@ -10,6 +10,6 @@ public class ClientTeamStarter implements NtStarter {
     public void start(NetworkTableInstance ntInstance, NtConfig config, Logger logger) {
         logger.info("Setting up NetworkTables client for team {}", config.getTeamNumber());
         ntInstance.setServerTeam(config.getTeamNumber());
-        ntInstance.startClient3("TeamCameraClient");
+        ntInstance.startClient3(config.getIdentity());
     }
 }
