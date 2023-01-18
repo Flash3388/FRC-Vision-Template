@@ -12,6 +12,7 @@ public class ClientCustomStarter implements NtStarter {
     public void start(NetworkTableInstance ntInstance, NtConfig config, Logger logger) {
         logger.info("Setting up NetworkTables client for server {} at port {}",
                 Arrays.toString(config.getAddresses()), config.getPort());
-        ntInstance.startClient(config.getAddresses(), config.getPort());
+        ntInstance.setServer(config.getAddresses(), config.getPort());
+        ntInstance.startClient3("CustomCameraClient");
     }
 }

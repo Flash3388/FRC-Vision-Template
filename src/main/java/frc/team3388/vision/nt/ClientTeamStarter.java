@@ -9,6 +9,7 @@ public class ClientTeamStarter implements NtStarter {
     @Override
     public void start(NetworkTableInstance ntInstance, NtConfig config, Logger logger) {
         logger.info("Setting up NetworkTables client for team {}", config.getTeamNumber());
-        ntInstance.startClientTeam(config.getTeamNumber());
+        ntInstance.setServerTeam(config.getTeamNumber());
+        ntInstance.startClient3("TeamCameraClient");
     }
 }
